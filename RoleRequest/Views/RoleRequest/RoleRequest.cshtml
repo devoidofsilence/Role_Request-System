@@ -1,0 +1,570 @@
+﻿@using RoleRequest.Models;
+@using RoleRequest.Filters;
+@model RoleRequest.Models.RoleRequestModel
+@{
+    ViewBag.Title = "RoleRequest";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    /*Start*/ /*Added for form fields*/ /*Roman Raj Bajracharya*/
+    .form-group.required label:before {
+        content: "*";
+        color: red;
+    }
+
+    .row .required label:before {
+        content: "*";
+        color: red;
+    }
+</style>
+<div class ="row">
+    <div class="offset-2 offset-md-10">( * ) fields are compulsory</div>
+</div>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <label>
+                <div class="row" style="line-height: 24px;">
+                    <div class="col-md-8">
+                        Role Request Form (Please verify all the details after input)</div>
+                    <div class="col-md-2">
+                        <span class="blueCircle" style="float: right;">Approved Changes</span></div>
+                    <div class="col-md-2">
+                        <span class="yellowCircle" style="float: right">Unapproved Changes</span></div>
+                </div>
+            </label>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("RoleRequest", "RoleRequest", FormMethod.Post, new { id = "rrForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="loggedInUser" value="@User.Identity.Name" />
+                @Html.HiddenFor(m => m.editMode)
+                @Html.HiddenFor(m => m.recommendMode)
+                @Html.HiddenFor(m => m.approveMode)
+                @Html.HiddenFor(m => m.rejectionFlag)
+                @Html.HiddenFor(m => m.RoleRequestId)
+                @Html.HiddenFor(m => m.RoleRequestDate)
+                bool readOnly = false;
+                <div class="form-row">
+                    <div class="form-group required col-md-4">
+                        <label>
+                            Full Name</label>
+                        @Html.HiddenFor(m => m.EmpSamAccountName)
+                        @Html.HiddenFor(m => m.EmployeeFullName)
+                        @Html.TextBoxFor(m => m.EmployeeFullName, new { @placeholder = "Full Name", @class = "form-control", @disabled = "disabled" })
+                        @Html.ValidationMessageFor(m => m.EmpSamAccountName, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(m => m.EmployeeFullName, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group required col-md-4">
+                        <label>
+                            Department (Select appropriate criteria only)</label>
+                        @Html.DropDownListFor(m => m.DepartmentId, (IEnumerable<SelectListItem>)ViewData["Department"], "-- Please Select --", new { @class = "form-control" })
+                        @*@Html.TextBoxFor(m => m.DepartmentName, new { @placeholder = "Department", @class = "form-control" }.ReadonlyIf(readOnly == true))*@
+                        @Html.ValidationMessageFor(m => m.DepartmentId, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group required col-md-4">
+                        <label>
+                            Branch</label>
+                        @Html.DropDownListFor(m => m.BranchLocationId, (IEnumerable<SelectListItem>)ViewData["BranchLocation"], "-- Please Select --", new { @class = "form-control" })
+                        @*@Html.TextBoxFor(m => m.BranchName, new { @placeholder = "Branch", @class = "form-control" }.ReadonlyIf(readOnly == true))*@
+                        @Html.ValidationMessageFor(m => m.BranchLocationId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group required col-md-4">
+                        <label>
+                            Corporate Title</label>
+                        @Html.DropDownListFor(m => m.CorporateTitleId, (IEnumerable<SelectListItem>)ViewData["CorporateTitle"], new { @class = "form-control" })
+                        @*@Html.TextBoxFor(m => m.CorporateTitle, new { @placeholder = "Corporate Title", @class = "form-control" }.ReadonlyIf(readOnly == true))*@
+                    </div>
+                    <div class="form-group required col-md-4">
+                        <label>
+                            Functional Title</label>
+                        @*@Html.DropDownListFor(m => m.FunctionalTitleId, (IEnumerable<SelectListItem>)ViewData["FunctionalTitle"], new { @class = "form-control" })*@
+                        @Html.TextBoxFor(m => m.FunctionalTitle, new { @placeholder = "Functional Title", @class = "form-control" }.ReadonlyIf(readOnly == true))
+                    </div>
+                    <div class="form-group required col-md-4">
+                        <label>
+                            Mobile Number
+                        </label>
+                        @Html.TextBoxFor(m => m.MOBILE_NUMBER, new { @placeholder = "Mobile Number", @class = "form-control", @type = "number" }.ReadonlyIf(readOnly == true))
+                        @Html.ValidationMessageFor(m => m.MOBILE_NUMBER, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <label>
+                                    For Existing Users</label></div>
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="form-group required col-md-4">
+                                        <label>
+                                            HRIS ID
+                                        </label>
+                                        @Html.TextBoxFor(m => m.HRIS_ID, new { @placeholder = "HRIS ID", @class = "form-control", @type = "number" }.ReadonlyIf(readOnly == true))
+                                        @Html.ValidationMessageFor(m => m.HRIS_ID, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label>
+                                            Flex ID</label>
+                                        @Html.TextBoxFor(m => m.FLEX_ID, new { @placeholder = "Flex ID", @class = "form-control" }.ReadonlyIf(readOnly == true))
+                                    </div>
+                                    <div class="form-group required col-md-4">
+                                        <label>
+                                            Email ID
+                                        </label>
+                                        @Html.TextBoxFor(m => m.EMAIL_ID, new { @placeholder = "Email ID", @class = "form-control" }.ReadonlyIf(readOnly == true))
+                                        @Html.ValidationMessageFor(m => m.EMAIL_ID, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <label>
+                                    Application Roles (Note: Please untick any application/roles if not required as it will be removed)</label></div>
+                            <div class="card-body">
+                                <div id="dvSecondaryRoles">
+                                    @if (Model.secondaryRoleDomain != null && Model.secondaryRoleDomain.lstApps != null)
+                                    {
+                                    <div class="form-row">
+                                        @Html.HiddenFor(m => m.secondaryRoleDomain.DomainId)
+                                        @Html.HiddenFor(m => m.secondaryRoleDomain.DomainName)
+                                        @{
+                                            int valueForSerialNo = 0;
+                                            var classToHide = string.Empty;
+                                        }
+                                        @for (int i = 0; i < Model.secondaryRoleDomain.lstApps.Count; i++)
+                                        {
+                                            if (Model.secondaryRoleDomain.lstApps[i].AppId == 18)//exclude option for BankEx
+                                            {
+                                                classToHide = "style=display:none";
+                                                valueForSerialNo--;
+                                            }
+                                            else
+                                            {
+                                                classToHide = string.Empty;
+                                            }
+                                            //if (Model.secondaryRoleDomain.lstApps[i].AppId != 18)//exclude option for BankEx
+                                            //{
+                                                @Html.HiddenFor(m => m.secondaryRoleDomain.lstApps[i].AppId)
+                                                @Html.HiddenFor(m => m.secondaryRoleDomain.lstApps[i].AppName)
+                                                <div class="form-group col-md-3" @classToHide>
+                                                    <label>
+                                                        @(valueForSerialNo + 1 + ". ")
+                                                        @(@Model.secondaryRoleDomain.lstApps[i].AppName.ToString())
+                                                    </label>
+                                                </div>
+                                                <div class="form-group col-md-3" @classToHide>
+                                                    @for (int j = 0; j < @Model.secondaryRoleDomain.lstApps[i].lstAccessLevel.Count; j++)
+                                                    {
+                                                        @Html.HiddenFor(m => m.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelId)
+                                                        @Html.HiddenFor(m => m.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelName)
+                                                        var form_check_inline_approved = (((Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && !Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected) || (!Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected) ? "form-check-inline form-check-inline-last-request" : "form-check-inline"));
+                                                        <div class="@form_check_inline_approved">
+                                                            <label class="form-check-label">
+                                                                @Html.CheckBoxFor(m => m.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected, new { @definedName = "rdoApplicationRoleAccess" + Model.secondaryRoleDomain.lstApps[i].AppId.ToString(), @class = "form-check-input checkbox-as-radio" }.ReadonlyIf(readOnly == true))
+                                                                @Html.HiddenFor(m => m.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelId)
+                                                                @Html.HiddenFor(m => m.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelName)
+                                                                @Html.HiddenFor(m => m.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag)
+                                                                @Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelName.ToString()
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                valueForSerialNo++;
+                                                //}
+                                            }
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <label>
+                                    Other Access (Note: Please tick Flexcube UBS roles for required SBLMIS reports)</label></div>
+                            <div class="card-body">
+                                <div id="dvPrimaryRoles">
+                                    @for (int i = 0; i < Model.lstPrimaryRoleModel.Count(); i++)
+                                    {
+                                        if (Model.lstPrimaryRoleModel[i] != null && Model.lstPrimaryRoleModel[i].PrimaryRoleName != String.Empty)
+                                        {
+                                            var form_check_inline_approved = (((Model.lstPrimaryRoleModel[i].LatestSavedRequestFlag && !Model.lstPrimaryRoleModel[i].IsSelected) || (!Model.lstPrimaryRoleModel[i].LatestSavedRequestFlag && Model.lstPrimaryRoleModel[i].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.lstPrimaryRoleModel[i].LatestSavedRequestFlag && Model.lstPrimaryRoleModel[i].IsSelected) ? "form-check-inline form-check-inline-last-request" : "form-check-inline"));
+                                        <div class="@form_check_inline_approved">
+                                            <label class="form-check-label">
+                                                @Html.CheckBoxFor(m => m.lstPrimaryRoleModel[i].IsSelected, new { @class = "form-check-input" }.ReadonlyIf(readOnly == true))
+                                                @(i + 1 + ". ")@Model.lstPrimaryRoleModel[i].PrimaryRoleName.ToString()
+                                                @Html.HiddenFor(m => Model.lstPrimaryRoleModel[i].PrimaryRoleId)
+                                                @Html.HiddenFor(m => Model.lstPrimaryRoleModel[i].PrimaryRoleName)
+                                                @Html.HiddenFor(m => Model.lstPrimaryRoleModel[i].LatestSavedRequestFlag)
+                                            </label>
+                                        </div>  
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        @if (Model.flexcubeRoleDomain != null && Model.flexcubeRoleDomain.lstApps != null)
+                        {
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-3">
+                                            <label>
+                                                Flexcube UBS
+                                            </label>
+                                        </div>
+                                        @for (int i = 0; i < Model.flexcubeRoleDomain.lstApps.Count; i++)
+                                        {
+                                            <div class="form-group col-md-9">
+                                                @for (int j = 0; j < Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel.Count; j++)
+                                                {
+                                                    var form_check_inline_approved = (((Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && !Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected) || (!Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected) ? "form-check-inline form-check-inline-last-request" : "form-check-inline"));
+                                                    <div class="@form_check_inline_approved">
+                                                        <label class="form-check-label">
+                                                            @Html.CheckBoxFor(m => m.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected, new { @definedName = "rdoApplicationRoleAccess" + Model.flexcubeRoleDomain.lstApps[i].AppId.ToString(), @class = "form-check-input checkbox-as-radio flexcubeAccessLvlChk" }.ReadonlyIf(readOnly == true))
+                                                            @Html.HiddenFor(m => m.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelId)
+                                                            @Html.HiddenFor(m => m.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelName)
+                                                            @Html.HiddenFor(m => m.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag)
+                                                            @Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelName.ToString()
+                                                        </label>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div id="dvFlexcubeUBSRoles">
+                                        @Html.HiddenFor(m => m.flexcubeRoleDomain.DomainId)
+                                        @Html.HiddenFor(m => m.flexcubeRoleDomain.DomainName)
+                                        @for (int i = 0; i < Model.flexcubeRoleDomain.lstApps.Count; i++)
+                                        {
+                                            @Html.HiddenFor(m => m.flexcubeRoleDomain.lstApps[i].AppId)
+                                            @Html.HiddenFor(m => m.flexcubeRoleDomain.lstApps[i].AppName)
+                                            for (int j = 0; j < @Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads.Count; j++)
+                                            {
+                                            @Html.HiddenFor(m => m.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].RoleHeadId)
+                                            @Html.HiddenFor(m => m.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].RoleHeadName)
+                                            <div class="form-row">
+                                                @for (int k = 0; k < @Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel.Count; k++)
+                                                {
+                                                    <div class="form-group col-md-3 col-sm-4">
+                                                        @Html.HiddenFor(m => m.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].RoleId)
+                                                        @Html.HiddenFor(m => m.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].RoleName)
+                                                        @Html.HiddenFor(m => m.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag)
+                                                        @{var form_check_inline_approved = (((Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && !Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected) || (!Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected) ? "form-check-inline form-check-inline-last-request" : "form-check-inline"));}
+                                                        <div class="@form_check_inline_approved">
+                                                            <label class="form-check-label">
+                                                                @(k + 1 + ". ")
+                                                                @Html.CheckBoxFor(m => m.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected, new { @class = "form-check-input flexcubeRoleChk" }.ReadonlyIf(readOnly == true))
+                                                                @(@Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].RoleName.ToString())
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            }
+                                        }
+                                    </div>
+                                    <br />
+                                    <div class="form-row">
+                                        <div class="form-group col-md-5">
+                                            <label>
+                                                Input Limit Amount(NPR.)</label>
+                                            @Html.TextBoxFor(m => m.InputLimitAmt, new { @placeholder = "Input Limit Amount", @class = "form-control", @type = "number" }.ReadonlyIf(readOnly == true))
+                                            @Html.ValidationMessageFor(m => m.InputLimitAmt, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="form-group col-md-5">
+                                            <label>
+                                                Authorization Limit Amount(NPR.)</label>
+                                            @Html.TextBoxFor(m => m.AuthorizationLimitAmt, new { @placeholder = "Authorization Limit Amount", @class = "form-control", @type = "number" }.ReadonlyIf(readOnly == true))
+                                            @Html.ValidationMessageFor(m => m.AuthorizationLimitAmt, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        @if (Model.edmsRoleDomain != null && Model.edmsRoleDomain.lstApps != null)
+                        {
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-3">
+                                            <label>
+                                                Electronic Document Management System(eDMS)
+                                            </label>
+                                        </div>
+                                        @for (int i = 0; i < Model.edmsRoleDomain.lstApps.Count; i++)
+                                        {
+                                            <div class="form-group col-md-9">
+                                                @for (int j = 0; j < Model.edmsRoleDomain.lstApps[i].lstAccessLevel.Count; j++)
+                                                {
+                                                    var form_check_inline_approved = (((Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && !Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected) || (!Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected) ? "form-check-inline form-check-inline-last-request" : "form-check-inline"));
+                                                    <div class="@form_check_inline_approved">
+                                                        <label class="form-check-label">
+                                                            @*@Html.CheckBoxFor(m => m.edmsRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected, new { @definedName = "rdoApplicationRoleAccess" + Model.edmsRoleDomain.lstApps[i].AppId.ToString(), @class = "form-check-input checkbox-as-radio edmsAccessLvlChk" }.ReadonlyIf(readOnly == true))*@
+                                                            @Html.CheckBoxFor(m => m.edmsRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected, new { @class = "form-check-input checkbox-as-radio edmsAccessLvlChk" }.ReadonlyIf(readOnly == true))
+                                                            @Html.HiddenFor(m => m.edmsRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelId)
+                                                            @Html.HiddenFor(m => m.edmsRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelName)
+                                                            @Html.HiddenFor(m => m.edmsRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag)
+                                                            @Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelName.ToString()
+                                                        </label>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div id="dvEDMSRoles">
+                                        @Html.HiddenFor(m => m.edmsRoleDomain.DomainId)
+                                        @Html.HiddenFor(m => m.edmsRoleDomain.DomainName)
+                                        @for (int i = 0; i < Model.edmsRoleDomain.lstApps.Count; i++)
+                                        {
+                                            @Html.HiddenFor(m => m.edmsRoleDomain.lstApps[i].AppId)
+                                            @Html.HiddenFor(m => m.edmsRoleDomain.lstApps[i].AppName)
+                                            <div class="form-row">
+                                                @for (int j = 0; j < @Model.edmsRoleDomain.lstApps[i].lstRoleHeads.Count; j++)
+                                                {
+                                                    <div class="form-group col-md-5ths col-sm-5ths">
+                                                        @Html.HiddenFor(m => m.edmsRoleDomain.lstApps[i].lstRoleHeads[j].RoleHeadId)
+                                                        @Html.HiddenFor(m => m.edmsRoleDomain.lstApps[i].lstRoleHeads[j].RoleHeadName)
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <label>@Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].RoleHeadName</label>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <div class="form-row">
+                                                                    @for (int k = 0; k < @Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel.Count; k++)
+                                                                    {
+                                                                        <div class="form-group col-md-12">
+                                                                            @Html.HiddenFor(m => m.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].RoleId)
+                                                                            @Html.HiddenFor(m => m.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].RoleName)
+                                                                            @Html.HiddenFor(m => m.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag)
+                                                                            @{var form_check_inline_approved = (((Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && !Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected) || (!Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected) ? "form-check-inline form-check-inline-last-request" : "form-check-inline"));}
+                                                                            <div class="@form_check_inline_approved">
+                                                                                <label class="form-check-label">
+                                                                                    @(k + 1 + ". ")
+                                                                                    @Html.CheckBoxFor(m => m.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected, new { @class = "form-check-input edmsRoleChk" }.ReadonlyIf(readOnly == true))
+                                                                                    @(@Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].RoleName.ToString())
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <br />
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>
+                            Additional Request</label>
+                        @Html.TextAreaFor(m => m.AdditionalRequest, new { @placeholder = "Briefly describe the request or mention specific functions for roles", @class = "form-control", @rows = "5" }.ReadonlyIf(readOnly == true))
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-5">
+                        <label for="cboRecommendationBy">
+                            Recommendation By</label>
+                        @Html.HiddenFor(m => m.RecommendationBySAM, new { @class = "by-id" })
+                        @Html.TextBoxFor(m => m.RecommendationByEmpName, new { @placeholder = "Immediate Supervisor", @class = "form-control adloader" }.ReadonlyIf(readOnly == true))
+                        @Html.ValidationMessageFor(m => m.RecommendationBySAM, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(m => m.RecommendationByEmpName, "", new { @class = "text-danger" })
+                        <div class="invalid-feedback">
+                            Please provide remarks.
+                        </div>
+                    </div>
+                    <div class="form-group col-md-5">
+                        <label for="cboApprovalBy">
+                            Approval By</label>
+                        @Html.HiddenFor(m => m.ApprovalBySAM, new { @class = "by-id" })
+                        @Html.TextBoxFor(m => m.ApprovalByEmpName, new { @placeholder = "Supervisor of Immediate Supervisor", @class = "form-control adloader" }.ReadonlyIf(readOnly == true))
+                        @Html.ValidationMessageFor(m => m.ApprovalBySAM, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(m => m.ApprovalByEmpName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+@*<div class="form-row">
+                    @if ((ViewData["EnableRecommendation"] != null && (bool)ViewData["EnableRecommendation"] == true) || (ViewData["EnableApproval"] != null && (bool)ViewData["EnableApproval"] == true) || (ViewData["EnableRecommendationRemarksView"] != null && (bool)ViewData["EnableRecommendationRemarksView"] == true) || (ViewData["EnableApprovalRemarksView"] != null && (bool)ViewData["EnableApprovalRemarksView"] == true))
+                    {
+                        <div class="form-group col-md-12">
+                            <label>
+                                Remarks</label>
+                            @Html.DisplayFor(m => m.Remarks)
+                        </div>
+                    }
+                </div>*@
+                <!-- Button trigger modal -->
+                        if (Model != null && Model.remarksList != null && Model.remarksList.Count > 0)
+                        {
+                <button type="button" class="btn btn-info float-right" data-toggle="modal" data-target="#remarksViewModal">
+                    <i class="fa fa-list"></i>&nbsp;Approval Log</button>
+                        }
+                        if (ViewData["EnableFormSubmission"] != null && (bool)ViewData["EnableFormSubmission"] == true)
+                        {
+                <button type="button" class="btn btn-sbl-yellow float-right btn-pre-submit" data-name="Command"
+                    data-value="Save" data-toggle="modal" data-target="#remarksModal">
+                    Place Request</button>
+                        }
+                        else if (ViewData["EnableRecommendation"] != null && (bool)ViewData["EnableRecommendation"] == true)
+                        {
+                <button type="button" class="btn btn-sbl-yellow float-right btn-pre-submit" data-name="Command"
+                    data-value="Recommend" data-toggle="modal" data-target="#remarksModal">
+                    Send for Approval</button>
+                <button type="button" class="btn btn-sbl-yellow float-right btn-pre-submit" data-name="Command"
+                    data-value="Return" data-toggle="modal" data-target="#remarksModal">
+                    Return</button>
+                        }
+                        else if (ViewData["EnableApproval"] != null && (bool)ViewData["EnableApproval"] == true)
+                        {
+                <button type="button" class="btn btn-sbl-yellow float-right btn-pre-submit" data-name="Command"
+                    data-value="Approve" data-toggle="modal" data-target="#remarksModal">
+                    Approve</button>
+                <button type="button" class="btn btn-sbl-yellow float-right btn-pre-submit" data-name="Command"
+                    data-value="Return" data-toggle="modal" data-target="#remarksModal">
+                    Return</button>
+                        }
+                <!-- Modal -->
+                <div class="modal fade" id="remarksModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalLabel">
+                                    Submit</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                @Html.TextAreaFor(m => m.Remarks, new { @placeholder = "Remarks", @class = "form-control remarks-text", @rows = "5", @required = string.Empty })
+                                @Html.ValidationMessageFor(m => m.Remarks, "", new { @class = "text-danger" })
+                                <div class="invalid-feedback">
+                                    Please provide remarks.
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                    Close</button>
+                                <button type="submit" class="btn btn-sbl-yellow float-right btn-submission" name="Command"
+                                    value="Save">
+                                    Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal fade" id="remarksViewModal" tabindex="-1" role="dialog" aria-labelledby="remarksViewModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="remarksViewModalLabel">
+                                    Approval Log</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                @if (Model != null && Model.remarksList != null)
+                                {
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-light table-hover table-striped">
+                                            <thead>
+                                                <tr class="bg-sbl-yellow">
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Request ID
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Remarks By
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Assign Date
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Complete Date
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Additional Request
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Remarks
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Action
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-striped">
+                                                @foreach (var row in Model.remarksList)
+                                                {
+                                                    <tr class="table-default">
+                                                        <td style="white-space: nowrap">@row.RequestId.ToString()
+                                                        </td>
+                                                        <td style="white-space: nowrap">@row.RemarksBy.ToString()
+                                                        </td>
+                                                        <td style="white-space: nowrap">@row.AssignDate.ToString()
+                                                        </td>
+                                                        <td style="white-space: nowrap">@row.CompleteDate.ToString()
+                                                        </td>
+                                                        <td>@row.AdditionalRequest.ToString()
+                                                        </td>
+                                                        <td>@row.Remarks.ToString()
+                                                        </td>
+                                                        <td style="white-space: nowrap">@row.Action.ToString()
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <h5>
+                                        No Data!</h5>
+                                }
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                    Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

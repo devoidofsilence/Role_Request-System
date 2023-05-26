@@ -1,0 +1,186 @@
+﻿@using RoleRequest.Models;
+@{
+    ViewBag.Title = "Access Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<ProvisionModel> forAccessAction = new List<ProvisionModel>();
+    if (ViewData["ForAccessAction"] != null)
+    {
+        forAccessAction = (List<ProvisionModel>)ViewData["ForAccessAction"];
+    }
+}
+<div class="table-responsive">
+    <table id="tbl_Admin" class="table table-bordered table-light table-hover table-striped">
+        <thead>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                    ARRF Id
+                </th>
+                <th scope="col">
+                    Requester
+                </th>
+                <th scope="col">
+                    Status
+                </th>
+                <th scope="col">
+                    Taken By
+                </th>
+                <th scope="col">
+                    Branch & Dept.
+                </th>
+                <th scope="col">
+                    Initiated Date
+                </th>
+                <th scope="col">
+                    Approved Date
+                </th>
+                <th scope="col">
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody class="table-striped">
+            @if (forAccessAction.Count > 0)
+            {
+                int i = 1;
+                foreach (var item in forAccessAction)
+                {
+                    var aggrClass = "table-default";
+                    if (item.ProvisionStatus == "DONE")
+                    {
+                        aggrClass = "table-default bg-sbl-green";
+                    }
+                    <tr class="@aggrClass">
+                        <td>
+                            @*@i.ToString()*@
+                            @item.RoleRequestId.ToString()
+                        </td>
+                        <td>
+                            @(item.RequestedByFullName == null ? "" : item.RequestedByFullName.ToString())
+                        </td>
+                        <td>
+                            @(item.ProvisionStatus == "IDLE" ? "New" : (item.ProvisionStatus == "INPR" ? "In Progress" : (item.ProvisionStatus == "DONE" ? "Completed" : String.Empty)))
+                        </td>
+                        <td>
+                            @(string.IsNullOrEmpty(item.ProvidedBy.ToString()) ? "-" : item.ProvidedBy.ToString())
+                        </td>
+                        <td>
+                            @(string.IsNullOrEmpty(item.BranchName.ToString()) ? "-" : item.BranchName.ToString())
+                        </td>
+                        <td>
+                            @(string.IsNullOrEmpty(item.InitiatedDate.ToString()) ? "-" : item.InitiatedDate.ToString())
+                        </td>
+                        <td>
+                            @(string.IsNullOrEmpty(item.ApprovedDate.ToString()) ? "-" : item.ApprovedDate.ToString())
+                        </td>
+                        <td>
+                            @if (item.ProvisionStatus == "DONE")
+                            {
+                                <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestAssignedViewOnly", "Provision", new { rrfID = item.RoleRequestId })'">
+                                    View
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("ProvisionByRRFAndProvisionId", "Provision", new { rrfID = item.RoleRequestId, provisionID = item.ProvisionId })'">
+                                    View
+                                </button>
+                            }
+                            &nbsp;
+                            <button type="button" class="btn btn-info btnViewRemarksInline" data-toggle="modal" data-target="#remarksViewModal" data-value="@item.RoleRequestId">
+                                <i class="fa fa-list"></i>&nbsp;Approval Log
+                            </button>
+                        </td>
+                    </tr>
+                    i++;
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                    ARRF Id
+                </th>
+                <th scope="col">
+                    Requester
+                </th>
+                <th scope="col">
+                    Status
+                </th>
+                <th scope="col">
+                    Taken By
+                </th>
+                <th scope="col">
+                    Branch & Dept.
+                </th>
+                <th scope="col">
+                    Initiated Date
+                </th>
+                <th scope="col">
+                    Approved Date
+                </th>
+                <th scope="col">
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+@*/*Modal For Viewing Approval Log*/*@
+<div class="modal fade" id="remarksViewModal" tabindex="-1" role="dialog" aria-labelledby="remarksViewModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="remarksViewModalLabel">
+                    Approval Log
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-light table-hover table-striped">
+                        <thead>
+                            <tr class="bg-sbl-yellow">
+                                <th scope="col" style="white-space: nowrap">
+                                    Request ID
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Remarks By
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Assign Date
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Complete Date
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Additional Request
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Remarks
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbdRemarks" class="table-striped">
+                            <tr class="table-default">
+                                <td colspan="7" class="text-center-align">
+                                    No data!
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,101 @@
+﻿@using RoleRequest.Models;
+@using RoleRequest.Filters;
+@model RoleRequest.Models.ProvisionModel
+@{
+    List<AccessProvisionDtlModel> apdmList = new List<AccessProvisionDtlModel>();
+    if (ViewData["AccessProvisionDtl"] != null)
+    {
+        apdmList = (List<AccessProvisionDtlModel>)ViewData["AccessProvisionDtl"];
+    }
+
+    List<PrimRoleProvisionDtlModel> prpdmList = new List<PrimRoleProvisionDtlModel>();
+    if (ViewData["PrimaryRoleProvisionDtl"] != null)
+    {
+        prpdmList = (List<PrimRoleProvisionDtlModel>)ViewData["PrimaryRoleProvisionDtl"];
+    }
+
+    AdditionalAccessProvisionDtlModel additionalAccess = new AdditionalAccessProvisionDtlModel();
+    if (ViewData["AdditionalAccessProvisionDtl"] != null)
+    {
+        additionalAccess = (AdditionalAccessProvisionDtlModel)ViewData["AdditionalAccessProvisionDtl"];
+    }
+}
+<div class="container highlighted-div">
+    <div class="card">
+        @{bool disabled = false;}
+        @if (Model.viewOnlyMode)
+        {
+            disabled = true;
+        }
+        <div class="card-header">
+            <label>
+                Provision</label></div>
+        <div class="card-body">
+            @if (Model != null && Model.prpdmList.Count > 0)
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <label>
+                                    Primary Roles</label></div>
+                            <div class="card-body">
+                                <div id="dvPrimaryRoles">
+                                    <div class="form-row">
+                                        @for (int i = 0; i < Model.prpdmList.Count; i++)
+                                        {
+                                            <div class="form-group col-md-4">
+                                                <label>
+                                                    @Model.prpdmList[i].PrimaryRoleName.ToString()
+                                                    @Html.TextAreaFor(m => Model.prpdmList[i].PrimaryRoleRemark, new { @placeholder = "Remarks", @class = "form-control" }.DisabledIf(disabled == true))
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (Model != null && Model.apdmList.Count > 0)
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <label>
+                                    Applications</label></div>
+                            <div class="card-body">
+                                <div id="dvSecondaryRoles">
+                                    <div class="form-row">
+                                        @for (int i = 0; i < Model.apdmList.Count; i++)
+                                        {
+                                            <div class="form-group col-md-4">
+                                                <label>
+                                                    @Model.apdmList[i].AppName.ToString()
+                                                    @Html.TextAreaFor(m => Model.apdmList[i].AppRemark, new { @placeholder = "Remarks", @class = "form-control" }.DisabledIf(disabled == true))
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (Model != null && (Model.prpdmList == null || Model.prpdmList.Count == 0) && (Model.apdmList == null || Model.apdmList.Count == 0))
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label>
+                            General Remarks:&nbsp;
+                            @Html.TextAreaFor(m => Model.additionalAccess.AccessRemarks, new { @placeholder = "Remarks", @class = "form-control" }.DisabledIf(disabled == true))
+                        </label>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

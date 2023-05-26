@@ -1,0 +1,102 @@
+﻿@using RoleRequest.Models;
+@using RoleRequest.Helpers;
+@{
+    List<RevokeEmployeeModel> employeeList = (List<RevokeEmployeeModel>)ViewData["HRUsersListForRevocation"];
+}
+<div class="table-responsive">
+    <table id="tbl_HRUsersForRevocation" class="table table-bordered table-light table-hover table-striped">
+        <thead>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                    #
+                </th>
+                <th scope="col">
+                    Full Name
+                </th>
+                <th scope="col">
+                    AD Username
+                </th>
+                <th scope="col">
+                    HRIS Id
+                </th>
+                <th scope="col">
+                    Email Id
+                </th>
+                <th scope="col">
+                    Branch
+                </th>
+                <th scope="col">
+                    Status
+                </th>
+                <th scope="col">
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody class="table-striped" id="hrUsersListTBodyForRevocation">
+            @if (employeeList.Count > 0)
+            {
+                int i = 1;
+                foreach (var item in employeeList)
+                {
+                <tr class="table-default countableRow">
+                    <td>@i.ToString()
+                    </td>
+                    <td>@item.EmployeeFullName.ConvertToString()
+                    </td>
+                    <td>@item.SamAccountName.ConvertToString()
+                    </td>
+                    <td>@item.HRISId.ConvertToString()
+                    </td>
+                    <td>@item.EmailId.ConvertToString()
+                    </td>
+                    <td>@item.BranchName.ConvertToString()
+                    </td>
+                    <td>@(item.RequestStatus.ConvertToString() == "INIT" ? "To ID Management" : (item.RequestStatus.ConvertToString() == "DONE" ? "Completed" : "Not Initiated"))
+                    </td>
+                    <td>
+                        @if (item.RequestStatus.ConvertToString() != "INIT" && item.RequestStatus.ConvertToString() != "DONE")
+                        {
+                        <div class="btn-toolbar">
+                            <button type="button" class="btn btn-info btnRevokeRequestModalOpener" data-toggle="modal" data-target="#revokeRequestModal" data-value="@item.SamAccountName">
+                                Revoke Request
+                            </button>
+                            @*<button type="button" class="btn btn-sbl-yellow float-right btn-submission btnRevokeRequest" data-name="Command"
+        data-value="@item.SamAccountName">
+                        Revoke Request</button>*@
+                        </div>
+                        }
+                    </td>
+                </tr>
+                        i++;
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                </th>
+                <th scope="col">
+                    Full Name
+                </th>
+                <th scope="col">
+                    AD Username
+                </th>
+                <th scope="col">
+                    HRIS Id
+                </th>
+                <th scope="col">
+                    Email Id
+                </th>
+                <th scope="col">
+                    Branch
+                </th>
+                <th scope="col">
+                    Status
+                </th>
+                <th scope="col">
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>

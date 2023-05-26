@@ -1,0 +1,115 @@
+﻿@using RoleRequest.Models;
+@using RoleRequest.Helpers;
+@{
+    List<RevokeRequestModel> revokeList = (List<RevokeRequestModel>)ViewData["IDMUsersListForRevocation"];
+}
+<div class="table-responsive">
+    <table id="tbl_IDMUsersForRevocation" class="table table-bordered table-light table-hover table-striped">
+        <thead>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                    #
+                </th>
+                <th scope="col">
+                    Full Name
+                </th>
+                <th scope="col">
+                    AD Username
+                </th>
+                <th scope="col">
+                    Taken By
+                </th>
+                <th scope="col">
+                    Status
+                </th>
+                <th scope="col">
+                    Resignation Date
+                </th>
+                <th scope="col">
+                    Revoke Request Date
+                </th>
+                <th scope="col">
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody class="table-striped" id="idmUsersListTBodyForRevocation">
+            @if (revokeList.Count > 0)
+            {
+                int i = 1;
+                foreach (var item in revokeList)
+                {
+                    <tr class="table-default countableRow">
+                        <td>
+                            @i.ToString()
+                        </td>
+                        <td>
+                            @item.RevokeEmpFullName.ConvertToString()
+                        </td>
+                        <td>
+                            @item.RevokeEmpUsername.ConvertToString()
+                        </td>
+                        <td>
+                            @(item.TakenBy.ConvertToString() == "" ? "-" : item.TakenBy.ConvertToString())
+                        </td>
+                        <td>
+                            @(item.RequestStatus.ConvertToString() == "INIT" ? "To ID Management" : (item.RequestStatus.ConvertToString() == "DONE" ? "Completed" : "Not Initiated"))
+                        </td>
+                        <td>
+                            @(item.ResignationDate!=null?item.ResignationDate.ToString("MM/dd/yyyy"):"")
+                        </td>
+                        <td>
+                            @(item.RevokeDate!=null?item.RevokeDate.ToString("MM/dd/yyyy"):"")
+                        </td>
+                        <td>
+                            @*@if (item.RequestStatus == "DONE")
+                                {
+                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RevocationByRevokeIdViewOnly", "IDManagement", new { revokeId = item.RevokeId })'">
+                                        View
+                                    </button>
+                                }
+                                else*@
+                            @if (item.RequestStatus == "INIT")
+                            {
+                                <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RevocationByRevokeId", "IDManagement", new { revokeId = item.RevokeId })'">
+                                    View
+                                </button>
+                            }
+                            else
+                            {
+                                <label>Revoked</label>
+                            }
+                        </td>
+                    </tr>
+                    i++;
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                </th>
+                <th scope="col">
+                    Full Name
+                </th>
+                <th scope="col">
+                    AD Username
+                </th>
+                <th scope="col">
+                    Taken By
+                </th>
+                <th scope="col">
+                    Status
+                </th>
+                <th scope="col">
+                    Resignation Date
+                </th>
+                <th scope="col">
+                    Revoke Request Date
+                </th>
+                <th scope="col">
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>

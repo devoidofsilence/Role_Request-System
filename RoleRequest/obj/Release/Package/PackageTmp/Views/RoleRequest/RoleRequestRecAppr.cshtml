@@ -1,0 +1,149 @@
+﻿@model RoleRequest.Models.RoleRequestModel
+@{
+    ViewBag.Title = "RoleRequestRecAppr";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            @{Html.RenderAction("RoleRequestByRRFIdChild", "RoleRequest", new { rrfID = ViewData["rrfID"].ToString(), mode = "viewOnly" });}
+            <!-- Button trigger modal -->
+            <br />
+            @using (Html.BeginForm("RoleRequest", "RoleRequest", FormMethod.Post, new { id = "rrForm" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.editMode)
+                @Html.HiddenFor(m => m.recommendMode)
+                @Html.HiddenFor(m => m.approveMode)
+                @Html.HiddenFor(m => m.rejectionFlag)
+                @Html.HiddenFor(m => m.RoleRequestId)
+                @Html.HiddenFor(m => m.RoleRequestDate)
+                if (ViewData["EnableRecommendation"] != null && (bool)ViewData["EnableRecommendation"] == true)
+                {
+                <button type="button" class="btn btn-sbl-yellow float-right btn-pre-submit" data-name="Command"
+                    data-value="Recommend" data-toggle="modal" data-target="#remarksModal">
+                    Send for Approval</button>
+                <button type="button" class="btn btn-sbl-yellow float-right btn-pre-submit" data-name="Command"
+                    data-value="Return" data-toggle="modal" data-target="#remarksModal">
+                    Return</button>
+                }
+                else if (ViewData["EnableApproval"] != null && (bool)ViewData["EnableApproval"] == true)
+                {
+                <button type="button" class="btn btn-sbl-yellow float-right btn-pre-submit" data-name="Command"
+                    data-value="Approve" data-toggle="modal" data-target="#remarksModal">
+                    Approve</button>
+                <button type="button" class="btn btn-sbl-yellow float-right btn-pre-submit" data-name="Command"
+                    data-value="Return" data-toggle="modal" data-target="#remarksModal">
+                    Return</button>
+                }
+                <!-- Modal -->
+                <div class="modal fade" id="remarksModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalLabel">
+                                    Submit</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                @Html.TextAreaFor(m => m.Remarks, new { @placeholder = "Remarks", @class = "form-control remarks-text", @rows = "5", @required = string.Empty })
+                                @Html.ValidationMessageFor(m => m.Remarks, "", new { @class = "text-danger" })
+                                <div class="invalid-feedback">
+                                    Please provide remarks.
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                    Close</button>
+                                <button type="submit" class="btn btn-sbl-yellow float-right btn-submission" name="Command"
+                                    value="Save">
+                                    Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="remarksViewModal" tabindex="-1" role="dialog" aria-labelledby="remarksViewModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="remarksViewModalLabel">
+                                    Approval Log</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                @if (Model != null && Model.remarksList != null)
+                                {
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-light table-hover table-striped">
+                                            <thead>
+                                                <tr class="bg-sbl-yellow">
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Request ID
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Remarks By
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Assign Date
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Complete Date
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Additional Request
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Remarks
+                                                    </th>
+                                                    <th scope="col" style="white-space: nowrap">
+                                                        Action
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-striped">
+                                                @foreach (var row in Model.remarksList)
+                                                {
+                                                    <tr class="table-default">
+                                                        <td style="white-space: nowrap">@row.RequestId.ToString()
+                                                        </td>
+                                                        <td style="white-space: nowrap">@row.RemarksBy.ToString()
+                                                        </td>
+                                                        <td style="white-space: nowrap">@row.AssignDate.ToString()
+                                                        </td>
+                                                        <td style="white-space: nowrap">@row.CompleteDate.ToString()
+                                                        </td>
+                                                        <td>@row.AdditionalRequest.ToString()
+                                                        </td>
+                                                        <td>@row.Remarks.ToString()
+                                                        </td>
+                                                        <td style="white-space: nowrap">@row.Action.ToString()
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <h5>
+                                        No Data!</h5>
+                                }
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                    Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

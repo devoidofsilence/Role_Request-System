@@ -1,0 +1,163 @@
+﻿@using RoleRequest.Models;
+@using RoleRequest.Helpers;
+@model RoleRequest.Models.RevokeRequestModel
+@{
+    ViewBag.Title = "Revocation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<AppAccessRevocationDtlModel> aardmList = new List<AppAccessRevocationDtlModel>();
+    if (ViewData["AccessRevocationDtl"] != null)
+    {
+        aardmList = (List<AppAccessRevocationDtlModel>)ViewData["AccessRevocationDtl"];
+    }
+
+    List<PrimRoleRevocationDtlModel> prrdmList = new List<PrimRoleRevocationDtlModel>();
+    if (ViewData["PrimaryRoleRevocationDtl"] != null)
+    {
+        prrdmList = (List<PrimRoleRevocationDtlModel>)ViewData["PrimaryRoleRevocationDtl"];
+    }
+}
+@{Html.RenderAction("RoleRequestByRRFIdChild", "RoleRequest", new { rrfID = Model.RoleRequestId.ToString(), mode = "viewOnlyRevoke" });}
+<br />
+@if ((Model != null && Model.TakenBy.ConvertToString() == "") || (Model != null && Model.TakenBy.ToLower().Trim() == User.Identity.Name.ToLower().Trim()))
+{
+    <div class="container highlighted-div">
+        <div class="card">
+            <div class="card-header">
+                <label>
+                    Revocation Form</label></div>
+            <div class="card-body">
+                @using (Html.BeginForm("SaveRevokeRequest", "IDManagement", FormMethod.Post, new { id = "revocationForm" }))
+                {
+                    <div>@Html.ValidationSummary()</div>
+                    if (Model != null)
+                    {
+                        @Html.HiddenFor(m => m.RevokeId)
+                        @Html.HiddenFor(m => m.RoleRequestId)
+                        @Html.HiddenFor(m => m.RevokeEmpUsername)
+                        @Html.HiddenFor(m => m.RequestStatus)
+                        @Html.HiddenFor(m => m.RequestedBy)
+                        @Html.HiddenFor(m => m.RevokeDate)
+                        @Html.HiddenFor(m => m.ResignationDate)
+                        @Html.HiddenFor(m => m.TakenBy)
+                        if (Model.prrdmList != null && Model.prrdmList.Count > 0)
+                        {
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <label>
+                                                Primary Roles
+                                            </label>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="dvPrimaryRoles">
+                                                <div class="form-row">
+                                                    @for (int i = 0; i < Model.prrdmList.Count; i++)
+                                                    {
+                                                        <div class="form-group col-md-2">
+                                                            <label>
+                                                                @Html.HiddenFor(m => Model.prrdmList[i].PrimRoleId)
+                                                                @Html.HiddenFor(m => Model.prrdmList[i].Status)
+                                                                @Html.HiddenFor(m => Model.prrdmList[i].PrimaryRoleName)
+                                                                @Model.prrdmList[i].PrimaryRoleName.ToString()
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-group col-md-1 btnPrimRoleBlock">
+                                                            @if (Model.prrdmList[i].Status != "REV")
+                                                            {
+
+                                                                <button type="button" class="btn btn-sbl-yellow float-right btn-submission btnRevokePrimRole" data-name="Command" data-prim-role-id="@Model.prrdmList[i].PrimRoleId" data-revoke-id="@Model.RevokeId" data-taking-by="@User.Identity.Name">
+                                                                    Revoke
+                                                                </button>
+                                                            }
+                                                            else
+                                                            {
+                                                                <label>
+                                                                    Revoked
+                                                                </label>
+                                                            }
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        if (Model.aardmList != null && Model.aardmList.Count > 0)
+                        {
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <label>
+                                                Third Party Applications
+                                            </label>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="dvSecondaryRoles">
+                                                <div class="form-row">
+                                                    @for (int i = 0; i < Model.aardmList.Count; i++)
+                                                    {
+                                                        <div class="form-group col-md-2">
+                                                            <label>
+                                                                @Html.HiddenFor(m => Model.aardmList[i].AppId)
+                                                                @Html.HiddenFor(m => Model.aardmList[i].Status)
+                                                                @Html.HiddenFor(m => Model.aardmList[i].AppName)
+                                                                @Model.aardmList[i].AppName.ToString()
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-group col-md-1 btnAppAccessBlock">
+                                                            @if (Model.aardmList[i].Status != "REV")
+                                                            {
+
+                                                                <button type="button" class="btn btn-sbl-yellow float-right btn-submission btnRevokeAppAccess" data-name="Command" data-app-id="@Model.aardmList[i].AppId" data-revoke-id="@Model.RevokeId" data-taking-by="@User.Identity.Name">
+                                                                    Revoke
+                                                                </button>
+                                                            }
+                                                            else
+                                                            {
+                                                                <label>
+                                                                    Revoked
+                                                                </label>
+                                                            }
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label>
+                                    General Remarks:&nbsp;
+                                    @Html.TextAreaFor(m => m.Remarks, new { @placeholder = "Remarks", @class = "form-control" })
+                                    @*@Html.ValidationMessageFor(m => m.Remarks, "", new { @class = "text-danger" })*@
+                                </label>
+                            </div>
+                        </div>
+                    }
+                    <span id="btnBlock">
+                        @if (Model.RequestStatus == "INIT")
+                        {
+                            if (!Model.AllRevoked)
+                            {
+                                <button id="btnRevokeAll" type="button" class="btn btn-sbl-yellow float-right" data-name="Command" data-revoke-id="@Model.RevokeId" data-taking-by="@User.Identity.Name">
+                                    Revoke All
+                                </button>
+                            }
+                            <button id="btnSave" type="submit" class="btn btn-sbl-yellow float-right" data-name="Command"
+                                    data-value="Save">
+                                Save
+                            </button>
+                        }
+                    </span>
+                }
+            </div>
+        </div>
+    </div>
+}

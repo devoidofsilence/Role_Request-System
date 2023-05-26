@@ -1,0 +1,123 @@
+﻿@using RoleRequest.Models;
+@using RoleRequest.Helpers;
+@{
+    List<EnrollUserModel> enrollUserList = (List<EnrollUserModel>)ViewData["EnrollUserList"];
+}
+<div class="table-responsive">
+    <table id="tbl_EnrollList" class="table table-bordered table-light table-hover table-striped">
+        <thead>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                    #
+                </th>
+                <th scope="col">
+                    Full Name
+                </th>
+                <th scope="col">
+                    Department
+                </th>
+                <th scope="col">
+                    Branch Location
+                </th>
+                <th scope="col">
+                    Corporate Title
+                </th>
+                <th scope="col">
+                    Functional Title
+                </th>
+                <th scope="col">
+                    Mobile No.
+                </th>
+                <th scope="col">
+                    Reporting Date
+                </th>
+                <th scope="col">
+                    Status
+                </th>
+                <th scope="col">
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody class="table-striped" id="enrollUserListTBody">
+            @if (enrollUserList.Count > 0)
+            {
+                int i = 1;
+                foreach (var item in enrollUserList)
+                {
+                    var aggrClass = "table-default countableRow";
+                    if (item.Status == "DONE")
+                    {
+                        aggrClass = "table-default countableRow bg-sbl-green";
+                    }
+                    else if (item.Status == "RJCT")
+                    {
+                        aggrClass = "table-default countableRow bg-sbl-grey";
+                    }
+                <tr class="@aggrClass">
+                    @*<td>@i.ToString()
+                    </td>*@
+                    <td>
+                    </td>
+                    <td>@item.FullName.ConvertToString()
+                    </td>
+                    <td>@item.DepartmentName.ConvertToString()
+                    </td>
+                    <td>@item.BranchLocationName.ConvertToString()
+                    </td>
+                    <td>@item.CorpTitleName.ConvertToString()
+                    </td>
+                    <td>@item.FunctionalTitle.ConvertToString()
+                    </td>
+                    <td>@item.MobileNumber.ConvertToString()
+                    </td>
+                    <td>@Convert.ToDateTime(item.JoinDate).ToString("yyyy/MM/dd")
+                    </td>
+                    <td>@(item.Status.ConvertToString() == "INIT" ? "To HR" : (item.Status.ConvertToString() == "FFAE" ? "To ID Management" : (item.Status.ConvertToString() == "DONE" ? "COMPLETED" : "REJECTED")))
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sbl-yellow btnEnrollUserDetailView" data-toggle="modal" data-target="#viewEnrollModal" data-current-user = "@User.Identity.Name.ToLower()" data-value="@item.EnrollUserID">
+                            View
+                        </button>
+                    </td>
+                </tr>
+                    i++;
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                    
+                </th>
+                <th scope="col">
+                    Full Name
+                </th>
+                <th scope="col">
+                    Department
+                </th>
+                <th scope="col">
+                    Branch Location
+                </th>
+                <th scope="col">
+                    Corporate Title
+                </th>
+                <th scope="col">
+                    Functional Title
+                </th>
+                <th scope="col">
+                    Mobile No.
+                </th>
+                <th scope="col">
+                    Reporting Date
+                </th>
+                <th scope="col">
+                    Status
+                </th>
+                <th scope="col">
+                    
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>

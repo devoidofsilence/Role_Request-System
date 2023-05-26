@@ -1,0 +1,304 @@
+﻿@using RoleRequest.Models;
+@using RoleRequest.Filters;
+@model RoleRequest.Models.RoleRequestModel
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <label>
+                <div class="row" style="line-height: 24px;">
+                    <div class="col-md-6">
+                        @(Model.RoleRequestId). Role Request of @(Model.EmpSamAccountName)
+                    </div>
+                    <div class="col-md-2">
+                        <span class="redCircle" style="float: right;">Revoking</span>
+                    </div>
+                    <div class="col-md-2">
+                        <span class="blueCircle" style="float: right;">Approved Changes</span>
+                    </div>
+                    <div class="col-md-2">
+                        <span class="yellowCircle" style="float: right">Unapproved Changes</span>
+                    </div>
+                </div>
+            </label>
+        </div>
+        <div class="card-body">
+            @{bool disabled = false;}
+            @if (Model.viewOnlyMode || Model.revokeMode)
+            {
+                disabled = true;
+            }
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label>
+                        Full Name
+                    </label>
+                    @Html.TextBoxFor(m => m.EmployeeFullName, new { @placeholder = "Full Name", @class = "form-control", @disabled = "disabled" })
+                </div>
+                <div class="form-group col-md-4">
+                    <label>
+                        Department
+                    </label>
+                    @Html.DropDownListFor(m => m.DepartmentId, (IEnumerable<SelectListItem>)ViewData["Department"], new { @class = "form-control" }.DisabledIf(disabled == true))
+                </div>
+                <div class="form-group col-md-4">
+                    <label>
+                        Branch
+                    </label>
+                    @Html.DropDownListFor(m => m.BranchLocationId, (IEnumerable<SelectListItem>)ViewData["BranchLocation"], new { @class = "form-control" }.DisabledIf(disabled == true))
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label>
+                        Corporate Title
+                    </label>
+                    @Html.DropDownListFor(m => m.CorporateTitleId, (IEnumerable<SelectListItem>)ViewData["CorporateTitle"], new { @class = "form-control" }.DisabledIf(disabled == true))
+                </div>
+                <div class="form-group col-md-4">
+                    <label>
+                        Functional Title
+                    </label>
+                    @*@Html.DropDownListFor(m => m.FunctionalTitleId, (IEnumerable<SelectListItem>)ViewData["FunctionalTitle"], new { @class = "form-control" }.DisabledIf(disabled == true))*@
+                    @Html.TextBoxFor(m => m.FunctionalTitle, new { @placeholder = "Functional Title", @class = "form-control" }.DisabledIf(disabled == true))
+                </div>
+                <div class="form-group col-md-4">
+                    <label>
+                        Mobile Number
+                    </label>
+                    @Html.TextBoxFor(m => m.MOBILE_NUMBER, new { @placeholder = "Mobile Number", @class = "form-control" }.DisabledIf(disabled == true))
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <label>
+                                Application Roles
+                            </label>
+                        </div>
+                        <div class="card-body">
+                            <div id="dvSecondaryRoles">
+                                @if (Model.secondaryRoleDomain != null && Model.secondaryRoleDomain.lstApps != null)
+                                {
+                                    <div class="form-row">
+                                        @{
+                                            int valueForSerialNo = 0;
+                                            var classToHide = string.Empty;
+                                        }
+                                        @for (int i = 0; i < Model.secondaryRoleDomain.lstApps.Count; i++)
+                                        {
+                                            if (Model.secondaryRoleDomain.lstApps[i].AppId == 18)//exclude option for BankEx
+                                            {
+                                                classToHide = "style=display:none";
+                                                valueForSerialNo--;
+                                            }
+                                            else
+                                            {
+                                                classToHide = string.Empty;
+                                            }
+                                            //if (Model.secondaryRoleDomain.lstApps[i].AppId != 18)//exclude option for BankEx
+                                            //{
+                                            <div class="form-group col-md-3" @classToHide>
+                                                <label>
+                                                    @(valueForSerialNo + 1 + ". ")
+                                                    @(@Model.secondaryRoleDomain.lstApps[i].AppName.ToString())
+                                                </label>
+                                            </div>
+                                            <div class="form-group col-md-3" @classToHide>
+                                                @for (int j = 0; j < @Model.secondaryRoleDomain.lstApps[i].lstAccessLevel.Count; j++)
+                                                {
+                                                    var form_check_inline_approved = (((Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && !Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected) || (!Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected && !Model.revokeMode) ? "form-check-inline form-check-inline-last-request" : (Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected && Model.revokeMode) ? "form-check-inline form-check-inline-revoking" : "form-check-inline"));
+                                                    <div class="@form_check_inline_approved">
+                                                        <label class="form-check-label">
+                                                            @Html.CheckBoxFor(m => m.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected, new { @definedName = "rdoApplicationRoleAccess" + Model.secondaryRoleDomain.lstApps[i].AppId.ToString(), @class = "form-check-input checkbox-as-radio" }.DisabledIf(disabled == true))
+                                                            @*@Html.CheckBoxFor(m => m.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected, new { @class = "form-check-input" }.DisabledIf(disabled == true))*@
+                                                            @Model.secondaryRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelName.ToString()
+                                                        </label>
+                                                    </div>
+                                                }
+                                            </div>
+                                            valueForSerialNo++;
+                                            //}
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <label>
+                                Other
+                            </label>
+                        </div>
+                        <div class="card-body">
+                            <div id="dvPrimaryRoles">
+                                @for (int i = 0; i < Model.lstPrimaryRoleModel.Count(); i++)
+                                {
+                                    if (Model.lstPrimaryRoleModel[i] != null && Model.lstPrimaryRoleModel[i].PrimaryRoleName != String.Empty)
+                                    {
+                                        var form_check_inline_approved = (((Model.lstPrimaryRoleModel[i].LatestSavedRequestFlag && !Model.lstPrimaryRoleModel[i].IsSelected) || (!Model.lstPrimaryRoleModel[i].LatestSavedRequestFlag && Model.lstPrimaryRoleModel[i].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.lstPrimaryRoleModel[i].LatestSavedRequestFlag && Model.lstPrimaryRoleModel[i].IsSelected && !Model.revokeMode) ? "form-check-inline form-check-inline-last-request" : (Model.lstPrimaryRoleModel[i].LatestSavedRequestFlag && Model.lstPrimaryRoleModel[i].IsSelected && Model.revokeMode) ? "form-check-inline form-check-inline-revoking" : "form-check-inline"));
+                                        <div class="@form_check_inline_approved">
+                                            <label class="form-check-label">
+                                                @(i + 1 + ". ")
+                                                @Html.CheckBoxFor(m => m.lstPrimaryRoleModel[i].IsSelected, new { @class = "form-check-input" }.DisabledIf(disabled == true))
+                                                @Model.lstPrimaryRoleModel[i].PrimaryRoleName.ToString()
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    @if (Model.flexcubeRoleDomain != null && Model.flexcubeRoleDomain.lstApps != null)
+                    {
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="form-row">
+                                    <div class="form-group col-md-3">
+                                        <label>
+                                            Flexcube UBS
+                                        </label>
+                                    </div>
+                                    @for (int i = 0; i < Model.flexcubeRoleDomain.lstApps.Count; i++)
+                                    {
+                                        <div class="form-group col-md-9">
+                                            @for (int j = 0; j < Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel.Count; j++)
+                                            {
+                                                var form_check_inline_approved = (((Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && !Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected) || (!Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected && !Model.revokeMode) ? "form-check-inline form-check-inline-last-request" : (Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected && Model.revokeMode) ? "form-check-inline form-check-inline-revoking" : "form-check-inline"));
+                                                <div class="@form_check_inline_approved">
+                                                    <label class="form-check-label">
+                                                        @Html.CheckBoxFor(m => m.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected, new { @definedName = "rdoApplicationRoleAccess" + Model.flexcubeRoleDomain.lstApps[i].AppId.ToString(), @class = "form-check-input checkbox-as-radio" }.DisabledIf(disabled == true))
+                                                        @Model.flexcubeRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelName.ToString()
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="dvFlexcubeUBSRoles">
+                                    @for (int i = 0; i < Model.flexcubeRoleDomain.lstApps.Count; i++)
+                                    {
+                                        <div class="form-row">
+                                            @for (int j = 0; j < @Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads.Count; j++)
+                                            {
+                                                for (int k = 0; k < @Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel.Count; k++)
+                                                {
+                                                    <div class="form-group col-md-3 col-sm-4">
+                                                        @{var form_check_inline_approved = (((Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && !Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected) || (!Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected && !Model.revokeMode) ? "form-check-inline form-check-inline-last-request" : (Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected && Model.revokeMode) ? "form-check-inline form-check-inline-revoking" : "form-check-inline"));}
+                                                        <div class="@form_check_inline_approved">
+                                                            <label class="form-check-label">
+                                                                @(k + 1 + ". ")
+                                                                @Html.CheckBoxFor(m => m.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected, new { @class = "form-check-input" }.DisabledIf(disabled == true))
+                                                                @(@Model.flexcubeRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].RoleName.ToString())
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                                <br />
+                                <div class="form-row">
+                                    <div class="form-group col-md-5">
+                                        <label>
+                                            Input Limit Amount(NPR)
+                                        </label>
+                                        @Html.TextBoxFor(m => m.InputLimitAmt, new { @placeholder = "Input Limit Amount", @class = "form-control", @type = "number" }.DisabledIf(disabled == true))
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <label>
+                                            Authorization Limit Amount(NPR.)
+                                        </label>
+                                        @Html.TextBoxFor(m => m.AuthorizationLimitAmt, new { @placeholder = "Authorization Limit Amount", @class = "form-control", @type = "number" }.DisabledIf(disabled == true))
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    @if (Model.edmsRoleDomain != null && Model.edmsRoleDomain.lstApps != null)
+                    {
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="form-row">
+                                    <div class="form-group col-md-3">
+                                        <label>
+                                            Electronic Document Management System eDMS
+                                        </label>
+                                    </div>
+                                    @for (int i = 0; i < Model.edmsRoleDomain.lstApps.Count; i++)
+                                    {
+                                        <div class="form-group col-md-9">
+                                            @for (int j = 0; j < Model.edmsRoleDomain.lstApps[i].lstAccessLevel.Count; j++)
+                                            {
+                                                var form_check_inline_approved = (((Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && !Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected) || (!Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected && !Model.revokeMode) ? "form-check-inline form-check-inline-last-request" : (Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].LatestSavedRequestFlag && Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected && Model.revokeMode) ? "form-check-inline form-check-inline-revoking" : "form-check-inline"));
+                                                <div class="@form_check_inline_approved">
+                                                    <label class="form-check-label">
+                                                        @Html.CheckBoxFor(m => m.edmsRoleDomain.lstApps[i].lstAccessLevel[j].IsSelected, new { @definedName = "rdoApplicationRoleAccess" + Model.edmsRoleDomain.lstApps[i].AppId.ToString(), @class = "form-check-input checkbox-as-radio" }.DisabledIf(disabled == true))
+                                                        @Model.edmsRoleDomain.lstApps[i].lstAccessLevel[j].AccessLevelName.ToString()
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="dvEDMSRoles">
+                                    @for (int i = 0; i < Model.edmsRoleDomain.lstApps.Count; i++)
+                                    {
+                                        <div class="form-row">
+                                            @for (int j = 0; j < @Model.edmsRoleDomain.lstApps[i].lstRoleHeads.Count; j++)
+                                            {
+                                                <div class="form-group col-md-5ths col-sm-5ths">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <label>@Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].RoleHeadName</label>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div class="form-row">
+                                                                @for (int k = 0; k < @Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel.Count; k++)
+                                                                {
+                                                                    <div class="form-group col-md-12">
+                                                                        @{var form_check_inline_approved = (((Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && !Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected) || (!Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected)) ? "form-check-inline form-check-inline-approved" : ((Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected && !Model.revokeMode) ? "form-check-inline form-check-inline-last-request" : (Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].LatestSavedRequestFlag && Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected && Model.revokeMode) ? "form-check-inline form-check-inline-revoking" : "form-check-inline"));}
+                                                                        <div class="@form_check_inline_approved">
+                                                                            <label class="form-check-label">
+                                                                                @(k + 1 + ". ")
+                                                                                @Html.CheckBoxFor(m => m.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].IsSelected, new { @class = "form-check-input" }.DisabledIf(disabled == true))
+                                                                                @(@Model.edmsRoleDomain.lstApps[i].lstRoleHeads[j].lstRolesModel[k].RoleName.ToString())
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <br />
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

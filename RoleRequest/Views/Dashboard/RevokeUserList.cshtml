@@ -1,0 +1,9 @@
+﻿@{
+    ViewBag.Title = "Revoke User List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!--Partial View Here-->
+<div id="prtlIDMUsersListForRevocation">
+    @{Html.RenderAction("IDMUsersListForRevocation", "IDManagement", new { idmADName = User.Identity.Name.ToString().ToLower() });}
+</div>

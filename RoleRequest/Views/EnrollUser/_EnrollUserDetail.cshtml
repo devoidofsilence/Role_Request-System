@@ -1,0 +1,137 @@
+﻿@model RoleRequest.Models.EnrollUserModel
+@*<div class="card">
+    <div class="card-header">
+        <label>
+            Details</label></div>
+    <div class="card-body">*@
+<div class="form-row">
+    <div class="form-group col-md-3">
+        <label>
+            Full Name::</label>
+    </div>
+    <div class="form-group col-md-3">
+        <label>@Html.DisplayFor(m => m.FullName)</label>
+    </div>
+    <div class="form-group col-md-3">
+        <label>
+            Department::</label>
+    </div>
+    <div class="form-group col-md-3">
+        <label>@Html.DisplayFor(m => m.DepartmentName)</label>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-3">
+        <label>
+            Branch::</label>
+    </div>
+    <div class="form-group col-md-3">
+        <label>@Html.DisplayFor(m => m.BranchLocationName)</label>
+    </div>
+    <div class="form-group col-md-3">
+        <label>
+            Corporate Title::</label>
+    </div>
+    <div class="form-group col-md-3">
+        <label>@Html.DisplayFor(m => m.CorpTitleName)</label>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-3">
+        <label>
+            Functional Title::</label>
+    </div>
+    <div class="form-group col-md-3">
+        <label>@Html.DisplayFor(m => m.FunctionalTitle)</label>
+    </div>
+    <div class="form-group col-md-3">
+        <label>
+            Mobile Number::</label>
+    </div>
+    <div class="form-group col-md-3">
+        <label>@Html.DisplayFor(m => m.MobileNumber)</label>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-3">
+        <label>
+            Reporting Date::</label>
+    </div>
+    <div class="form-group col-md-3">
+        <label>
+            @Html.DisplayFor(m => m.JoinDate)</label>
+    </div>
+</div>
+@if (!String.IsNullOrEmpty(Model.EmployeeID) && !String.IsNullOrEmpty(Model.EmployeeIDPwd))
+{
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label>
+                Employee ID::</label>
+        </div>
+        <div class="form-group col-md-3">
+            <label>@Html.DisplayFor(m => m.EmployeeID)</label>
+        </div>
+        <div class="form-group col-md-3">
+            <label>
+                Employee ID Password::</label>
+        </div>
+        <div class="form-group col-md-3">
+            <label>@Html.DisplayFor(m => m.EmployeeIDPwd)</label>
+        </div>
+    </div>
+}
+@if (!String.IsNullOrEmpty(Model.ADUsername) && !String.IsNullOrEmpty(Model.ADPassword))
+{
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label>
+                AD username::</label>
+        </div>
+        <div class="form-group col-md-3">
+            <label>@Html.DisplayFor(m => m.ADUsername)</label>
+        </div>
+        <div class="form-group col-md-3">
+            <label>
+                AD Password::</label>
+        </div>
+        <div class="form-group col-md-3">
+            <label>@Html.DisplayFor(m => m.ADPassword)</label>
+        </div>
+    </div>
+}
+@if (!String.IsNullOrEmpty(Model.Email) && !String.IsNullOrEmpty(Model.EmailPwd))
+{
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label>
+                Email ID::</label>
+        </div>
+        <div class="form-group col-md-3">
+            <label>@Html.DisplayFor(m => m.Email)</label>
+        </div>
+        <div class="form-group col-md-3">
+            <label>
+                Email Password::</label>
+        </div>
+        <div class="form-group col-md-3">
+            <label>@Html.DisplayFor(m => m.EmailPwd)</label>
+        </div>
+    </div>
+}
+@if (!String.IsNullOrEmpty(Model.Status) && Model.Status == "RJCT")
+{
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label>
+                Rejection Remarks::</label>
+        </div>
+        <div class="form-group col-md-3">
+            <label>
+                @Html.DisplayFor(m => m.Remarks)</label>
+        </div>
+    </div>
+}
+@*</div>
+</div>
+*@

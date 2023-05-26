@@ -1,0 +1,69 @@
+﻿@model RoleRequest.Models.EnrollUserModel
+@using (Html.BeginForm("EnrollUser", "EnrollUser", FormMethod.Post, new { @id = "enrollUserForm", @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label>
+                Full Name
+            </label>
+            @Html.TextBoxFor(m => m.FullName, new { @placeholder = "Full Name", @class = "form-control validated-control" })
+            <span class="field-validation-error text-danger" handle="FullName"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label>
+                Department
+            </label>
+            @Html.DropDownListFor(m => m.DepartmentId, (IEnumerable<SelectListItem>)ViewData["Department"], new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label>
+                Branch Location
+            </label>
+            @Html.DropDownListFor(m => m.BranchLocationId, (IEnumerable<SelectListItem>)ViewData["BranchLocation"], new { @class = "form-control" })
+        </div>
+        <div class="form-group col-md-6">
+            <label>
+                Corporate Title
+            </label>
+            @Html.DropDownListFor(m => m.CorpTitleId, (IEnumerable<SelectListItem>)ViewData["CorporateTitle"], new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label>
+                Functional Title
+            </label>
+            @*@Html.DropDownListFor(m => m.FuncTitleId, (IEnumerable<SelectListItem>)ViewData["FunctionalTitle"], new { @class = "form-control" })*@
+            @Html.TextBoxFor(m => m.FunctionalTitle, new { @placeholder = "Functional Title", @class = "form-control" })
+        </div>
+        <div class="form-group col-md-6">
+            <label>
+                Mobile Number
+            </label>
+            @Html.TextBoxFor(m => m.MobileNumber, new { @placeholder = "Mobile Number", @class = "form-control validated-control", @type = "number" })
+            <span class="field-validation-error text-danger" handle="MobileNumber"></span>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label>
+                Reporting Date
+            </label>
+            @Html.TextBoxFor(m => m.JoinDate, new { @placeholder = "Reporting Date", @class = "form-control dateField validated-control", @readOnly = "readonly" })
+            <span class="field-validation-error text-danger" handle="JoinDate"></span>
+        </div>
+    </div>
+    @*<div class="form-row">
+        <div class="form-group col-md-12">
+            <label>
+                Remarks
+            </label>
+            @Html.TextAreaFor(m => m.Remarks, new { @placeholder = "Remarks", @rows = "2", @class = "form-control" })
+        </div>
+    </div>*@
+    <button type="submit" class="btn btn-sbl-yellow float-right btn-submission">
+        Submit</button>
+}

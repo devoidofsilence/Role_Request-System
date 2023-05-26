@@ -1,0 +1,134 @@
+﻿@using RoleRequest.Models;
+@using RoleRequest.Helpers;
+@{
+    List<EnrollUserModel> enrollUserList = (List<EnrollUserModel>)ViewData["IDMUsersList"];
+}
+<div class="table-responsive">
+    <table id="tbl_IDMUsers" data-order="[]" class="table table-bordered table-light table-hover table-striped">
+        <thead>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                    #
+                </th>
+                <th scope="col">
+                    Full Name
+                </th>
+                <th scope="col">
+                    HRIS Id
+                </th>
+                <th scope="col">
+                    Department
+                </th>
+                <th scope="col">
+                    Branch Location
+                </th>
+                <th scope="col">
+                    Corporate Title
+                </th>
+                <th scope="col">
+                    Functional Title
+                </th>
+                <th scope="col">
+                    Mobile No.
+                </th>
+                <th scope="col">
+                    Reporting Date
+                </th>
+                @*<th scope="col">
+                        Status
+                    </th>*@
+                <th scope="col">
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody class="table-striped" id="idmUsersListTBody">
+            @if (enrollUserList.Count > 0)
+            {
+                int i = 1;
+                foreach (var item in enrollUserList)
+                {
+            <tr class="table-default countableRow">
+                <td>
+                    @i.ToString()
+                </td>
+                <td>
+                    @item.FullName.ConvertToString()
+                </td>
+                <td>
+                    @item.EmployeeID.ConvertToString()
+                </td>
+                <td>
+                    @item.DepartmentName.ConvertToString()
+                </td>
+                <td>
+                    @item.BranchLocationName.ConvertToString()
+                </td>
+                <td>
+                    @item.CorpTitleName.ConvertToString()
+                </td>
+                <td>
+                    @item.FunctionalTitle.ConvertToString()
+                </td>
+                <td>
+                    @item.MobileNumber.ConvertToString()
+                </td>
+                <td>
+                    @Convert.ToDateTime(item.JoinDate).ToString("yyyy/MM/dd")
+                </td>
+                @*<td>@(item.Status.ConvertToString() == "INIT" ? "To HR" : (item.Status.ConvertToString() == "FFAE" ? "To ID Management" : "UNDEFINED"))
+        </td>*@
+                <td>
+                    @if (item.Status.ConvertToString() == "FFAE")
+                    {
+                        <button type="button" class="btn btn-info btnIDMUsersForm" data-toggle="modal" data-target="#idmFormModal" data-current-user="@User.Identity.Name.ToLower()" data-value="@item.EnrollUserID" data-backdrop="static" data-keyboard="false">
+                            Provide Details
+                        </button>
+                    }
+                    else
+                    {
+                        <span>Details already provided</span>
+                    }
+                </td>
+            </tr>
+                    i++;
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                </th>
+                <th scope="col">
+                    Full Name
+                </th>
+                <th scope="col">
+                    HRIS Id
+                </th>
+                <th scope="col">
+                    Department
+                </th>
+                <th scope="col">
+                    Branch Location
+                </th>
+                <th scope="col">
+                    Corporate Title
+                </th>
+                <th scope="col">
+                    Functional Title
+                </th>
+                <th scope="col">
+                    Mobile No.
+                </th>
+                <th scope="col">
+                    Reporting Date
+                </th>
+                @*<th scope="col">
+            Status
+        </th>*@
+                <th scope="col">
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>

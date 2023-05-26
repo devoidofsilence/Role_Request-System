@@ -1,0 +1,56 @@
+﻿@{
+    ViewBag.Title = "Enroll User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <button id="btnEnrollUser" type="button" class="btn btn-sbl-yellow float-left" data-toggle="modal" data-target="#enrollUserModal"
+                data-backdrop="static" data-keyboard="false" data-val="@User.Identity.Name.ToLower()">
+            Enroll User
+        </button>
+    </div>
+</div>
+<!--Partial View Here-->
+<div id="prtlEnrollUser">
+    @{Html.RenderAction("EnrollUsersListBySupervisorADName", "EnrollUser", new { supervisorADName = User.Identity.Name.ToString().ToLower() });}
+</div>
+
+<div class="modal fade" id="enrollUserModal" tabindex="-1" role="dialog" aria-labelledby="enrollUserModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="enrollUserModalLabel">
+                    Enroll User
+                    <br />
+                    (This process creates Employee ID, Active Directory Username and Email)
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @{Html.RenderAction("EnrollUser", "EnrollUser");}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewEnrollModal" tabindex="-1" role="dialog" aria-labelledby="viewEnrollModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewEnrollModalLabel">
+                    User Enroll Detail
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="prtlEnrollUserDetail">
+            </div>
+        </div>
+    </div>
+</div>

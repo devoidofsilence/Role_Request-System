@@ -1,0 +1,230 @@
+﻿@using RoleRequest.Models;
+@{
+    ViewBag.Title = "Recommendation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<RoleRequestModel> forRecommendationList = new List<RoleRequestModel>();
+    if (ViewData["ForRecommendation"] != null)
+    {
+        forRecommendationList = (List<RoleRequestModel>)ViewData["ForRecommendation"];
+    }
+}
+<h2>FOR RECOMMENDATION(BY YOU)</h2>
+<br />
+<div class="table-responsive">
+    <table id="tbl_Recommender" class="table table-bordered table-light table-hover table-striped">
+        <thead>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                    #
+                </th>
+                <th scope="col">
+                    Requester
+                </th>
+                <th scope="col">
+                    Branch & Dept.
+                </th>
+                <th scope="col">
+                    Status
+                </th>
+                <th scope="col">
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody class="table-striped">
+            @if (forRecommendationList.Count > 0)
+            {
+                int i = 1;
+                foreach (var item in forRecommendationList)
+                {
+                    var aggrClass = "table-default";
+                    if (item.RequestStatus == "ASGN")
+                    {
+                        aggrClass = "table-default bg-sbl-green";
+                    }
+                    <tr class="@aggrClass">
+                        <td>
+                            @i.ToString()
+                        </td>
+                        <td>
+                            @item.EmployeeFullName.ToString()
+                        </td>
+                        <td>
+                            @(item.BranchName + "-" + item.DepartmentName)
+                        </td>
+                        <td>
+                            @(item.RequestStatus == "INIT" ? "For Recommendation" : (item.RequestStatus == "RECC" ? "For Approval" : (item.RequestStatus == "CORR" ? "Returned" : (item.RequestStatus == "CORA" ? "Returned" : (item.RequestStatus == "CORI" ? "Returned" : (item.RequestStatus == "APPR" ? "To IAM Team" + (!string.IsNullOrEmpty(item.AccessGiver) ? (" (" + item.AccessGiver.ToString() + ")") : "") : "Completed"))))))
+                        </td>
+                        <td>
+                            @if (item.RequestStatus == "INIT")
+                            {
+                                <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestRecAppr", "RoleRequest", new { rrfID = item.RoleRequestId, mode = "recommend" })'">
+                                    View
+                                </button>
+                            }
+                            else if (item.RequestStatus == "CORR" || item.RequestStatus == "RECC" || item.RequestStatus == "CORA" || item.RequestStatus == "CORI" || item.RequestStatus == "APPR")
+                            {
+                                <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestViewOnly", "RoleRequest", new { rrfID = item.RoleRequestId })'">
+                                    View
+                                </button>
+                            }
+                            else if (item.RequestStatus == "ASGN")
+                            {
+                                <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestViewOnly", "RoleRequest", new { rrfID = item.RoleRequestId })'">
+                                    View
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestByRRFId", "RoleRequest", new { rrfID = item.RoleRequestId, mode = "recommend" })'">
+                                    View
+                                </button>
+                            }
+                            &nbsp;
+                            <button type="button" class="btn btn-info btnViewRemarksInline" data-toggle="modal" data-target="#remarksViewModal" data-value="@item.RoleRequestId">
+                                <i class="fa fa-list"></i>&nbsp;Approval Log
+                            </button>
+                        </td>
+                    </tr>
+                    i++;
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr class="bg-sbl-yellow">
+                <th scope="col">
+                </th>
+                <th scope="col">
+                    Requester
+                </th>
+                <th scope="col">
+                    Branch & Dept.
+                </th>
+                <th scope="col">
+                    Status
+                </th>
+                <th scope="col">
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="modal fade" id="remarksViewModal" tabindex="-1" role="dialog" aria-labelledby="remarksViewModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="remarksViewModalLabel">
+                    Approval Log
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-light table-hover table-striped">
+                        <thead>
+                            <tr class="bg-sbl-yellow">
+                                <th scope="col" style="white-space: nowrap">
+                                    Request ID
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Remarks By
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Assign Date
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Complete Date
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Additional Request
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Remarks
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbdRemarks" class="table-striped">
+                            <tr class="table-default">
+                                <td colspan="7" class="text-center-align">
+                                    No data!
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*/*Modal For Viewing Approval Log*/*@
+<div class="modal fade" id="remarksViewModal" tabindex="-1" role="dialog" aria-labelledby="remarksViewModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="remarksViewModalLabel">
+                    Approval Log
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-light table-hover table-striped">
+                        <thead>
+                            <tr class="bg-sbl-yellow">
+                                <th scope="col" style="white-space: nowrap">
+                                    Request ID
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Remarks By
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Assign Date
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Complete Date
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Additional Request
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Remarks
+                                </th>
+                                <th scope="col" style="white-space: nowrap">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbdRemarks" class="table-striped">
+                            <tr class="table-default">
+                                <td colspan="7" class="text-center-align">
+                                    No data!
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

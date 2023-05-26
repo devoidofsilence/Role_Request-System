@@ -1,0 +1,6 @@
+﻿@{
+    ViewBag.Title = "RoleRequestViewOnly";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{Html.RenderAction("RoleRequestByRRFIdChild", "RoleRequest", new { rrfID = ViewData["rrfID"].ToString(), mode = "viewOnly" });}

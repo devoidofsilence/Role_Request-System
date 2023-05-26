@@ -1,0 +1,180 @@
+﻿@using RoleRequest.Models;
+@model RoleRequest.Models.ProvisionModel
+@{
+    ViewBag.Title = "Provision";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<AccessProvisionDtlModel> apdmList = new List<AccessProvisionDtlModel>();
+    if (ViewData["AccessProvisionDtl"] != null)
+    {
+        apdmList = (List<AccessProvisionDtlModel>)ViewData["AccessProvisionDtl"];
+    }
+
+    List<PrimRoleProvisionDtlModel> prpdmList = new List<PrimRoleProvisionDtlModel>();
+    if (ViewData["PrimaryRoleProvisionDtl"] != null)
+    {
+        prpdmList = (List<PrimRoleProvisionDtlModel>)ViewData["PrimaryRoleProvisionDtl"];
+    }
+
+    AdditionalAccessProvisionDtlModel additionalAccess = new AdditionalAccessProvisionDtlModel();
+    if (ViewData["AdditionalAccessProvisionDtl"] != null)
+    {
+        additionalAccess = (AdditionalAccessProvisionDtlModel)ViewData["AdditionalAccessProvisionDtl"];
+    }
+}
+@{Html.RenderAction("RoleRequestByRRFIdChild", "RoleRequest", new { rrfID = Model.RoleRequestId.ToString(), mode = "viewOnly" });}
+<br />
+@if ((Model != null && Model.ProvidedBy == null) || (Model != null && Model.ProvidedBy.ToLower().Trim() == User.Identity.Name.ToLower().Trim()) && Model.RequestedByUsername.ToLower().Trim() != User.Identity.Name.ToLower().Trim())
+{
+    <div class="container highlighted-div">
+        <div class="card">
+            <div class="card-header">
+                <label>
+                    Provision Form</label></div>
+            <div class="card-body">
+                @using (Html.BeginForm("SaveRequest", "Provision", FormMethod.Post, new { id = "provisionForm" }))
+                {
+                    if (Model != null)
+                    {
+                    @Html.HiddenFor(m => m.ProvisionId)
+                    @Html.HiddenFor(m => m.RoleRequestId)
+                    @Html.HiddenFor(m => m.ProvisionStatus)
+                    @Html.HiddenFor(m => m.rejectionFlag)
+                    @Html.HiddenFor(m => m.ProvidedBy)
+                    @Html.HiddenFor(m => m.RequestedByUsername)
+                        if (Model.prpdmList != null && Model.prpdmList.Count > 0)
+                        {
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <label>
+                                        Primary Roles</label></div>
+                                <div class="card-body">
+                                    <div id="dvPrimaryRoles">
+                                        <div class="form-row">
+                                            @for (int i = 0; i < Model.prpdmList.Count; i++)
+                                            {
+                                                <div class="form-group col-md-4">
+                                                    <label>
+                                                        @Html.HiddenFor(m => Model.prpdmList[i].RrfId)
+                                                        @Html.HiddenFor(m => Model.prpdmList[i].ProvisionId)
+                                                        @Html.HiddenFor(m => Model.prpdmList[i].PrimaryRoleId)
+                                                        @Html.HiddenFor(m => Model.prpdmList[i].PrimaryRoleName)
+                                                        @Model.prpdmList[i].PrimaryRoleName.ToString()
+                                                        @Html.TextAreaFor(m => Model.prpdmList[i].PrimaryRoleRemark, new { @placeholder = "Remarks", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(m => Model.prpdmList[i].PrimaryRoleRemark, "", new { @class = "text-danger" })
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        }
+                        if (Model.apdmList != null && Model.apdmList.Count > 0)
+                        {
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <label>
+                                        Third Party Applications</label></div>
+                                <div class="card-body">
+                                    <div id="dvSecondaryRoles">
+                                        <div class="form-row">
+                                            @for (int i = 0; i < Model.apdmList.Count; i++)
+                                            {
+                                                <div class="form-group col-md-4">
+                                                    <label>
+                                                        @Html.HiddenFor(m => Model.apdmList[i].RrfId)
+                                                        @Html.HiddenFor(m => Model.apdmList[i].AccessProvisionId)
+                                                        @Html.HiddenFor(m => Model.apdmList[i].AppId)
+                                                        @Html.HiddenFor(m => Model.apdmList[i].AppName)
+                                                        @Model.apdmList[i].AppName.ToString()
+                                                        @Html.TextAreaFor(m => Model.apdmList[i].AppRemark, new { @placeholder = "Remarks", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(m => Model.apdmList[i].AppRemark, "", new { @class = "text-danger" })
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        }
+                        if ((Model.prpdmList == null || Model.prpdmList.Count == 0) && (Model.apdmList == null || Model.apdmList.Count == 0))
+                        {
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label>
+                                @Html.HiddenFor(m => Model.additionalAccess.RrfId)
+                                @Html.HiddenFor(m => Model.additionalAccess.ProvisionId)
+                                General Remarks:&nbsp;
+                                @Html.TextAreaFor(m => Model.additionalAccess.AccessRemarks, new { @placeholder = "Remarks", @class = "form-control" })
+                                @Html.ValidationMessageFor(m => Model.additionalAccess.AccessRemarks, "", new { @class = "text-danger" })
+                            </label>
+                        </div>
+                    </div>
+                        }
+                    }
+@*<div class="form-row">
+                    <div class="form-group col-md-12">
+                        @Html.TextAreaFor(m => m.Remarks, new { @placeholder = "Remarks", @class = "form-control remarks-text", @rows = "5" })
+                        @Html.ValidationMessageFor(m => m.Remarks, "", new { @class = "text-danger" })
+                    </div>
+                </div>*@
+                    <span id="btnBlock">
+                            <button type="button" class="btn btn-sbl-yellow float-right btn-pre-submit" data-name="Command"
+                                data-value="Return" data-toggle="modal" data-target="#remarksModal">
+                                Return</button>
+                        
+                            @if (Model.ProvisionStatus == "INPR" && Model.ProvidedBy.ToLower().Trim() == User.Identity.Name.ToLower().Trim())
+                            {
+                            <button id="btnSave" type="button" class="btn btn-sbl-yellow float-right btn-pre-submit"
+                                data-name="Command" data-value="Save" data-toggle="modal" data-target="#remarksModal">
+                                Save</button>
+                            }
+                            else
+                            {
+                            <button id="btnTakeRequest" type="button" class="btn btn-sbl-yellow float-right btn-submission" data-name="Command"
+                    data-value="Take Request" value="@Model.RoleRequestId">
+                                Take Request</button>
+                            }
+                    </span>
+                    <!-- Modal -->
+                    <div class="modal fade" id="remarksModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modalLabel">
+                                        Submit</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    @Html.TextAreaFor(m => m.Remarks, new { @placeholder = "Remarks", @class = "form-control remarks-text", @rows = "5", @required = string.Empty })
+                                    @Html.ValidationMessageFor(m => m.Remarks, "", new { @class = "text-danger" })
+                                    <div class="invalid-feedback">
+                                        Please provide remarks.
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                        Close</button>
+                                    <button type="submit" class="btn btn-sbl-yellow float-right btn-submission" name="Command"
+                                        value="Save">
+                                        Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

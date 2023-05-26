@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "RoleRequestViewOnly";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    List<int> rrfIds = (List<int>)ViewData["rrfIDs"];
+    int count = 1;
+}
+@foreach (int rrfId in rrfIds)
+{
+    Html.RenderAction("RoleRequestByRRFIdChildForBMs", "RoleRequest", new { sno = count ,rrfID = rrfId, mode = "viewOnly" });
+    <br />
+    count++;
+}

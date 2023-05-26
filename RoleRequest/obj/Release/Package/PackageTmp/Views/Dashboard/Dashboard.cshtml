@@ -1,0 +1,759 @@
+﻿@using RoleRequest.Models;
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //RoleRequestModel roleRequestDtl = new RoleRequestModel();
+    List<RoleRequestModel> rrmList = new List<RoleRequestModel>();
+    List<RoleRequestModel> forRecommendationList = new List<RoleRequestModel>();
+    List<RoleRequestModel> forApprovalList = new List<RoleRequestModel>();
+    List<ProvisionModel> forAccessAction = new List<ProvisionModel>();
+    List<string> userRole = null;
+    bool newRequest = false;
+    if (ViewData["RoleRequestList"] != null)
+    {
+        rrmList = (List<RoleRequestModel>)ViewData["RoleRequestList"];
+        newRequest = rrmList.All(x => x.RequestStatus == "ASGN");
+    }
+    if (ViewData["ForRecommendation"] != null)
+    {
+        forRecommendationList = (List<RoleRequestModel>)ViewData["ForRecommendation"];
+    }
+    if (ViewData["ForApproval"] != null)
+    {
+        forApprovalList = (List<RoleRequestModel>)ViewData["ForApproval"];
+    }
+    if (ViewData["ForAccessAction"] != null)
+    {
+        forAccessAction = (List<ProvisionModel>)ViewData["ForAccessAction"];
+    }
+    if (ViewData["UserRole"] != null)
+    {
+        userRole = (List<string>)ViewData["UserRole"];
+    }
+}
+<div class="nav-padded">
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link active" id="nav-requested-tab" data-toggle="tab" href="#nav-requested"
+               role="tab" aria-controls="nav-requested" aria-selected="true">Requested <span class="badge badge-warning">@rrmList.Count</span></a>
+            <a class="nav-item nav-link" id="nav-recommendation-tab" data-toggle="tab" href="#nav-recommendation"
+               role="tab" aria-controls="nav-recommendation" aria-selected="false">
+                Recommendation
+                <span class="badge badge-warning">@forRecommendationList.Count</span>
+            </a> <a class="nav-item nav-link"
+                    id="nav-approval-tab" data-toggle="tab" href="#nav-approval" role="tab" aria-controls="nav-approval"
+                    aria-selected="false">Approval <span class="badge badge-warning">@forApprovalList.Count</span></a>
+                    @if (userRole != null && userRole.Contains("ADMIN"))
+                    {
+                        <a class="nav-item nav-link" id="nav-admin-tab" data-toggle="tab" href="#nav-admin"
+                           role="tab" aria-controls="nav-admin" aria-selected="false">Admin <span class="badge badge-warning">@forAccessAction.Count</span></a>
+                    }
+                    <a class="nav-item nav-link" id="nav-enroll-user-tab" data-toggle="tab" href="#nav-enroll-user"
+                       role="tab" aria-controls="nav-enroll-user" aria-selected="false">
+                        Enroll User <span class="badge badge-warning" id="enrollUserCnt"></span>
+                    </a>
+                    @if (userRole != null && userRole.Contains("HR_ADMIN"))
+                    {
+                        <a class="nav-item nav-link" id="nav-hr-users-tab" data-toggle="tab" href="#nav-hr-users"
+                           role="tab" aria-controls="nav-hr-users" aria-selected="false">
+                            HR Admin <span class="badge badge-warning"
+                                           id="hrUsersCnt"></span>
+                        </a>
+                    }
+                    @if (userRole != null && userRole.Contains("ADMIN"))
+                    {
+                        <a class="nav-item nav-link" id="nav-idm-users-tab" data-toggle="tab" href="#nav-idm-users"
+                           role="tab" aria-controls="nav-idm-users" aria-selected="false">
+                            ID Management <span class="badge badge-warning" id="idmUsersCnt"></span>
+                        </a>
+                    }
+                    @if (userRole != null && userRole.Contains("HR_ADMIN"))
+                    {
+                        <a class="nav-item nav-link" id="nav-hr-users-tab-for-revocation" data-toggle="tab" href="#nav-hr-users-list-for-revocation"
+                           role="tab" aria-controls="nav-hr-users-list-for-revocation" aria-selected="false">
+                            Revoke <span class="badge badge-warning"
+                                         id="hrUsersListForRevocationCnt"></span>
+                        </a>
+                    }
+                    @if (userRole != null && userRole.Contains("ADMIN"))
+                    {
+                        <a class="nav-item nav-link" id="nav-idm-users-tab-for-revocation" data-toggle="tab" href="#nav-idm-users-list-for-revocation"
+                           role="tab" aria-controls="nav-idm-users-list-for-revocation" aria-selected="false">Revoke User List <span class="badge badge-warning" id="idmUsersListForRevocationCnt"></span></a>
+                    }
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-requested" role="tabpanel" aria-labelledby="nav-requested-tab">
+                    @if (newRequest)
+                    {
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button class="btn btn-sbl-yellow float-left rrf-view-btn" onclick="location.href='@Url.Action("RoleRequest", "RoleRequest")'">
+                                    New Request
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    <div class="table-responsive">
+                        <table id="tbl_Requester" class="table table-bordered table-light table-hover table-striped">
+                            <thead>
+                                <tr class="bg-sbl-yellow">
+                                    <th scope="col">
+                                        #
+                                    </th>
+                                    <th scope="col">
+                                        Requester
+                                    </th>
+                                    <th scope="col">
+                                        Branch & Dept.
+                                    </th>
+                                    <th scope="col">
+                                        Status
+                                    </th>
+                                    <th scope="col">
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-striped">
+                                @if (rrmList.Count > 0)
+                                {
+                                    int i = 1;
+                                    foreach (var item in rrmList)
+                                    {
+                                        var aggrClass = "table-default";
+                                        if (item.RequestStatus == "ASGN")
+                                        {
+                                            aggrClass = "table-default bg-sbl-green";
+                                        }
+                                        <tr class="@aggrClass">
+                                            <td>
+                                                @i.ToString()
+                                            </td>
+                                            <td>
+                                                @item.EmployeeFullName
+                                            </td>
+                                            <td>
+                                                @(item.BranchName + "-" + item.DepartmentName)
+                                            </td>
+                                            <td>
+                                                @(item.RequestStatus == "INIT" ? "For Recommendation" : (item.RequestStatus == "RECC" ? "For Approval" : (item.RequestStatus == "CORR" ? "Returned" : (item.RequestStatus == "CORA" ? "Returned" : (item.RequestStatus == "CORI" ? "Returned" : (item.RequestStatus == "APPR" ? "To IAM Team" + (!string.IsNullOrEmpty(item.AccessGiver) ? (" (" + item.AccessGiver.ToString() + ")") : "") : (item.RequestStatus == "TBCK" ? "Taken Back" : "Completed")))))))
+                                            </td>
+                                            <td>
+                                                @if (item.RequestStatus == "INIT" || item.RequestStatus == "RECC" || item.RequestStatus == "APPR")
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestViewOnly", "RoleRequest", new { rrfID = item.RoleRequestId })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                else if (item.RequestStatus == "ASGN")
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestAssignedViewOnly", "Provision", new { rrfID = item.RoleRequestId })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequest", "RoleRequest")'">
+                                                        View
+                                                    </button>
+                                                }&nbsp;
+                                                <button type="button" class="btn btn-info btnViewRemarksInline" data-toggle="modal" data-target="#remarksViewModal" data-value="@item.RoleRequestId">
+                                                    <i class="fa fa-list"></i>&nbsp;Approval Log
+                                                </button>
+                                                @if ((item.RequestStatus == "INIT" || item.RequestStatus == "RECC"))
+                                                {
+                                                    <button type="button" class="btn btn-info btnTakeBackRequest" data-toggle="modal" data-target="#takeBackRemarksModal" data-value="@item.RoleRequestId">
+                                                        Take Back
+                                                    </button>
+                                                }&nbsp;
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-sbl-yellow">
+                                    <th scope="col">
+                                    </th>
+                                    <th scope="col">
+                                        Requester
+                                    </th>
+                                    <th scope="col">
+                                        Branch & Dept.
+                                    </th>
+                                    <th scope="col">
+                                        Status
+                                    </th>
+                                    <th scope="col">
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-recommendation" role="tabpanel" aria-labelledby="nav-recommendation-tab">
+                    <div class="table-responsive">
+                        <table id="tbl_Recommender" class="table table-bordered table-light table-hover table-striped">
+                            <thead>
+                                <tr class="bg-sbl-yellow">
+                                    <th scope="col">
+                                        #
+                                    </th>
+                                    <th scope="col">
+                                        Requester
+                                    </th>
+                                    <th scope="col">
+                                        Branch & Dept.
+                                    </th>
+                                    <th scope="col">
+                                        Status
+                                    </th>
+                                    <th scope="col">
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-striped">
+                                @if (forRecommendationList.Count > 0)
+                                {
+                                    int i = 1;
+                                    foreach (var item in forRecommendationList)
+                                    {
+                                        var aggrClass = "table-default";
+                                        if (item.RequestStatus == "ASGN")
+                                        {
+                                            aggrClass = "table-default bg-sbl-green";
+                                        }
+                                        <tr class="@aggrClass">
+                                            <td>
+                                                @i.ToString()
+                                            </td>
+                                            <td>
+                                                @item.EmployeeFullName.ToString()
+                                            </td>
+                                            <td>
+                                                @(item.BranchName + "-" + item.DepartmentName)
+                                            </td>
+                                            <td>
+                                                @(item.RequestStatus == "INIT" ? "For Recommendation" : (item.RequestStatus == "RECC" ? "For Approval" : (item.RequestStatus == "CORR" ? "Returned" : (item.RequestStatus == "CORA" ? "Returned" : (item.RequestStatus == "CORI" ? "Returned" : (item.RequestStatus == "APPR" ? "To IAM Team" + (!string.IsNullOrEmpty(item.AccessGiver) ? (" (" + item.AccessGiver.ToString() + ")") : "") : "Completed"))))))
+                                            </td>
+                                            <td>
+                                                @if (item.RequestStatus == "INIT")
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestRecAppr", "RoleRequest", new { rrfID = item.RoleRequestId, mode = "recommend" })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                else if (item.RequestStatus == "CORR" || item.RequestStatus == "RECC" || item.RequestStatus == "CORA" || item.RequestStatus == "CORI" || item.RequestStatus == "APPR")
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestViewOnly", "RoleRequest", new { rrfID = item.RoleRequestId })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                else if (item.RequestStatus == "ASGN")
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestViewOnly", "RoleRequest", new { rrfID = item.RoleRequestId })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestByRRFId", "RoleRequest", new { rrfID = item.RoleRequestId, mode = "recommend" })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                &nbsp;
+                                                <button type="button" class="btn btn-info btnViewRemarksInline" data-toggle="modal" data-target="#remarksViewModal" data-value="@item.RoleRequestId">
+                                                    <i class="fa fa-list"></i>&nbsp;Approval Log
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-sbl-yellow">
+                                    <th scope="col">
+                                    </th>
+                                    <th scope="col">
+                                        Requester
+                                    </th>
+                                    <th scope="col">
+                                        Branch & Dept.
+                                    </th>
+                                    <th scope="col">
+                                        Status
+                                    </th>
+                                    <th scope="col">
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-approval" role="tabpanel" aria-labelledby="nav-approval-tab">
+                    <div class="table-responsive">
+                        <table id="tbl_Approver" class="table table-bordered table-light table-hover table-striped">
+                            <thead>
+                                <tr class="bg-sbl-yellow">
+                                    <th scope="col">
+                                        #
+                                    </th>
+                                    <th scope="col">
+                                        Requester
+                                    </th>
+                                    <th scope="col">
+                                        Branch & Dept.
+                                    </th>
+                                    <th scope="col">
+                                        Status
+                                    </th>
+                                    <th scope="col">
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-striped">
+                                @if (forApprovalList.Count > 0)
+                                {
+                                    int i = 1;
+                                    foreach (var item in forApprovalList)
+                                    {
+                                        var aggrClass = "table-default";
+                                        if (item.RequestStatus == "ASGN")
+                                        {
+                                            aggrClass = "table-default bg-sbl-green";
+                                        }
+                                        <tr class="@aggrClass">
+                                            <td>
+                                                @i.ToString()
+                                            </td>
+                                            <td>
+                                                @item.EmployeeFullName.ToString()
+                                            </td>
+                                            <td>
+                                                @(item.BranchName + "-" + item.DepartmentName)
+                                            </td>
+                                            <td>
+                                                @(item.RequestStatus == "INIT" ? "For Recommendation" : (item.RequestStatus == "RECC" ? "For Approval" : (item.RequestStatus == "CORR" ? "Returned" : (item.RequestStatus == "CORA" ? "Returned" : (item.RequestStatus == "CORI" ? "Returned" : (item.RequestStatus == "APPR" ? "To IAM Team" + (!string.IsNullOrEmpty(item.AccessGiver) ? (" ("+item.AccessGiver.ToString()+")"):"") : "Completed"))))))
+                                            </td>
+                                            <td>
+                                                @if (item.RequestStatus == "RECC")
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestRecAppr", "RoleRequest", new { rrfID = item.RoleRequestId, mode = "approve" })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                else if (item.RequestStatus == "CORR" || item.RequestStatus == "CORA" || item.RequestStatus == "CORI" || item.RequestStatus == "APPR" || item.RequestStatus == "INIT")
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestViewOnly", "RoleRequest", new { rrfID = item.RoleRequestId })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                else if (item.RequestStatus == "ASGN")
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestViewOnly", "RoleRequest", new { rrfID = item.RoleRequestId })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestByRRFId", "RoleRequest", new { rrfID = item.RoleRequestId, mode = "approve" })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                &nbsp;
+                                                <button type="button" class="btn btn-info btnViewRemarksInline" data-toggle="modal" data-target="#remarksViewModal" data-value="@item.RoleRequestId">
+                                                    <i class="fa fa-list"></i>&nbsp;Approval Log
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-sbl-yellow">
+                                    <th scope="col">
+                                    </th>
+                                    <th scope="col">
+                                        Requester
+                                    </th>
+                                    <th scope="col">
+                                        Branch & Dept.
+                                    </th>
+                                    <th scope="col">
+                                        Status
+                                    </th>
+                                    <th scope="col">
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-enroll-user" role="tabpanel" aria-labelledby="nav-enroll-user-tab">
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button id="btnEnrollUser" type="button" class="btn btn-sbl-yellow float-left" data-toggle="modal" data-target="#enrollUserModal"
+                                    data-backdrop="static" data-keyboard="false" data-val="@User.Identity.Name.ToLower()">
+                                Enroll User
+                            </button>
+                        </div>
+                    </div>
+                    <!--Partial View Here-->
+                    <div id="prtlEnrollUser">
+                        @{Html.RenderAction("EnrollUsersListBySupervisorADName", "EnrollUser", new { supervisorADName = User.Identity.Name.ToString().ToLower() });}
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-admin" role="tabpanel" aria-labelledby="nav-admin-tab">
+                    <div class="table-responsive">
+                        <table id="tbl_Admin" class="table table-bordered table-light table-hover table-striped">
+                            <thead>
+                                <tr class="bg-sbl-yellow">
+                                    <th scope="col">
+                                        ARRF Id
+                                    </th>
+                                    <th scope="col">
+                                        Requester
+                                    </th>
+                                    <th scope="col">
+                                        Status
+                                    </th>
+                                    <th scope="col">
+                                        Taken By
+                                    </th>
+                                    <th scope="col">
+                                        Branch & Dept.
+                                    </th>
+                                    <th scope="col">
+                                        Initiated Date
+                                    </th>
+                                    <th scope="col">
+                                        Approved Date
+                                    </th>
+                                    <th scope="col">
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-striped">
+                                @if (forAccessAction.Count > 0)
+                                {
+                                    int i = 1;
+                                    foreach (var item in forAccessAction)
+                                    {
+                                        var aggrClass = "table-default";
+                                        if (item.ProvisionStatus == "DONE")
+                                        {
+                                            aggrClass = "table-default bg-sbl-green";
+                                        }
+                                        <tr class="@aggrClass">
+                                            <td>
+                                                @*@i.ToString()*@
+                                                @item.RoleRequestId.ToString()
+                                            </td>
+                                            <td>
+                                                @(item.RequestedByFullName == null ? "" : item.RequestedByFullName.ToString())
+                                            </td>
+                                            <td>
+                                                @(item.ProvisionStatus == "IDLE" ? "New" : (item.ProvisionStatus == "INPR" ? "In Progress" : (item.ProvisionStatus == "DONE" ? "Completed" : String.Empty)))
+                                            </td>
+                                            <td>
+                                                @(string.IsNullOrEmpty(item.ProvidedBy.ToString()) ? "-" : item.ProvidedBy.ToString())
+                                            </td>
+                                            <td>
+                                                @(string.IsNullOrEmpty(item.BranchName.ToString()) ? "-" : item.BranchName.ToString())
+                                            </td>
+                                            <td>
+                                                @(string.IsNullOrEmpty(item.InitiatedDate.ToString()) ? "-" : item.InitiatedDate.ToString())
+                                            </td>
+                                            <td>
+                                                @(string.IsNullOrEmpty(item.ApprovedDate.ToString()) ? "-" : item.ApprovedDate.ToString())
+                                            </td>
+                                            <td>
+                                                @if (item.ProvisionStatus == "DONE")
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("RoleRequestAssignedViewOnly", "Provision", new { rrfID = item.RoleRequestId })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-sbl-yellow rrf-view-btn" onclick="location.href='@Url.Action("ProvisionByRRFAndProvisionId", "Provision", new { rrfID = item.RoleRequestId, provisionID = item.ProvisionId })'">
+                                                        View
+                                                    </button>
+                                                }
+                                                &nbsp;
+                                                <button type="button" class="btn btn-info btnViewRemarksInline" data-toggle="modal" data-target="#remarksViewModal" data-value="@item.RoleRequestId">
+                                                    <i class="fa fa-list"></i>&nbsp;Approval Log
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-sbl-yellow">
+                                    <th scope="col">
+                                        ARRF Id
+                                    </th>
+                                    <th scope="col">
+                                        Requester
+                                    </th>
+                                    <th scope="col">
+                                        Status
+                                    </th>
+                                    <th scope="col">
+                                        Taken By
+                                    </th>
+                                    <th scope="col">
+                                        Branch & Dept.
+                                    </th>
+                                    <th scope="col">
+                                        Initiated Date
+                                    </th>
+                                    <th scope="col">
+                                        Approved Date
+                                    </th>
+                                    <th scope="col">
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-hr-users" role="tabpanel" aria-labelledby="nav-hr-users-tab">
+                    <br />
+                    <!--Partial View Here-->
+                    <div id="prtlHRUsers">
+                        @{Html.RenderAction("HRUsersList", "HR", new { hrADName = User.Identity.Name.ToString().ToLower() });}
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-idm-users" role="tabpanel" aria-labelledby="nav-idm-users-tab">
+                    <br />
+                    <!--Partial View Here-->
+                    <div id="prtlIDMUsers">
+                        @{Html.RenderAction("IDMUsersList", "IDManagement", new { idmADName = User.Identity.Name.ToString().ToLower() });}
+                    </div>
+                </div>
+                @*Added for revocation*@
+                <div class="tab-pane fade" id="nav-hr-users-list-for-revocation" role="tabpanel" aria-labelledby="nav-hr-users-tab-for-revocation">
+                    <br />
+                    <!--Partial View Here-->
+                    <div id="prtlHRUsersListForRevocation">
+                        @{Html.RenderAction("HRUsersListForRevocation", "HR");}
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-idm-users-list-for-revocation" role="tabpanel" aria-labelledby="nav-idm-users-tab-for-revocation">
+                    <br />
+                    <!--Partial View Here-->
+                    <div id="prtlIDMUsersListForRevocation">
+                        @{Html.RenderAction("IDMUsersListForRevocation", "IDManagement", new { idmADName = User.Identity.Name.ToString().ToLower() });}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="remarksViewModal" tabindex="-1" role="dialog" aria-labelledby="remarksViewModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="remarksViewModalLabel">
+                            Approval Log
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-light table-hover table-striped">
+                                <thead>
+                                    <tr class="bg-sbl-yellow">
+                                        <th scope="col" style="white-space: nowrap">
+                                            Request ID
+                                        </th>
+                                        <th scope="col" style="white-space: nowrap">
+                                            Remarks By
+                                        </th>
+                                        <th scope="col" style="white-space: nowrap">
+                                            Assign Date
+                                        </th>
+                                        <th scope="col" style="white-space: nowrap">
+                                            Complete Date
+                                        </th>
+                                        <th scope="col" style="white-space: nowrap">
+                                            Additional Request
+                                        </th>
+                                        <th scope="col" style="white-space: nowrap">
+                                            Remarks
+                                        </th>
+                                        <th scope="col" style="white-space: nowrap">
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbdRemarks" class="table-striped">
+                                    <tr class="table-default">
+                                        <td colspan="7" class="text-center-align">
+                                            No data!
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="enrollUserModal" tabindex="-1" role="dialog" aria-labelledby="enrollUserModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="enrollUserModalLabel">
+                            Enroll User
+                            <br />
+                            (This process creates Employee ID, Active Directory Username and Email)
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @{Html.RenderAction("EnrollUser", "EnrollUser");}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="hrFormModal" tabindex="-1" role="dialog" aria-labelledby="hrFormModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="hrFormModalLabel">
+                            HR Form
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="prtlHRUserForm">
+                        @*@{Html.RenderAction("UserHRDetailForm", "HR", new { EnrollUserID =  });}*@
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="hrFormRejectModal" tabindex="-1" role="dialog" aria-labelledby="hrFormRejectModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="hrFormRejectModalLabel">
+                            Reject
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="prtlHRUserRejectForm">
+                        @*@{Html.RenderAction("UserHRDetailForm", "HR", new { EnrollUserID =  });}*@
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="idmFormModal" tabindex="-1" role="dialog" aria-labelledby="idmFormModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="idmFormModalLabel">
+                            ID Management Form
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="prtlIDMUserForm">
+                        @*@{Html.RenderAction("UserIDMDetailForm", "IDManagement");}*@
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="viewEnrollModal" tabindex="-1" role="dialog" aria-labelledby="viewEnrollModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewEnrollModalLabel">
+                            User Enroll Detail
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="prtlEnrollUserDetail">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="takeBackRemarksModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel">
+                            Take Back
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @Html.TextArea("TakeBackRemarks", string.Empty, new { @placeholder = "Remarks", @class = "form-control", @rows = "5", @required = string.Empty })
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-sbl-yellow float-right btn-submission-take-back" name="Command"
+                                value="Save">
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*Revocation*@
+        <div class="modal fade" id="revokeRequestModal" tabindex="-1" role="dialog" aria-labelledby="revokeRequestModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="revokeRequestModalLabel">
+                            Revoke Request
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="prtlRevokeRequest">
+                    </div>
+                </div>
+            </div>
+        </div>

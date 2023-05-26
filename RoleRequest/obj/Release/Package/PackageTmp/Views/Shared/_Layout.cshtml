@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Role Request Form</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+        crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width" />
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <header>
+        <div class="content-wrapper">
+            <div class="float-left">
+                <p class="site-title">
+                    <a href="@Url.Action("Dashboard", "Dashboard")">
+                        <img src="https://www.siddharthabank.com/assets/backend/uploads/Logo/logo-new.png" />
+                    </a>
+                </p>
+            </div>
+            <div class="float-right">
+                <section id="login">
+                    @Html.Partial("_LoginPartial")
+                </section>
+                <nav>
+                    <ul id="menu">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li>@Html.ActionLink("Dashboard", "Dashboard", "Dashboard", null, new { @class = "dashboard-btn" })</li>
+@*<li>@Html.ActionLink("Dashboard", "Dashboard", "Dashboard")</li>*@
+                        }
+@*<li>@Html.ActionLink("About", "About", "Home")</li>
+                            <li>@Html.ActionLink("Contact", "Contact", "Home")</li>*@
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div id="body">
+        @RenderSection("featured", required: false)
+        <section class="content-wrapper main-content clear-fix">
+            @if (TempData["UserMessage"] != null)
+            {
+                var message = (RoleRequest.Models.Utils.MessageVM)TempData["UserMessage"];
+                <div aria-live="polite" aria-atomic="true" style="position: relative; z-index: 1000">
+                    <div class="@message.CssClassName" style="position: absolute; top: 0; right: 0;">
+                        <div class="toast-header">
+                            @message.Title
+                        </div>
+                        <div class="toast-body">
+                            @message.Message
+                        </div>
+                    </div>
+                </div>
+            }
+            @RenderBody()
+            <button id="go-to-top" class="btn btn-primary scroll-top" data-scroll="up" type="button">
+                @*<i class="fa fa-chevron-up"></i>*@
+                <svg width="20px" height="20px" fill="white" viewbox="0 0 1024 574" aria-labelledby="grsi-ant-up-title"
+                    id="si-ant-up">
+                    <title id="grsi-ant-up-title">icon up</title>
+                    <path d="M1015 564q-10 10-23 10t-23-10L512 82 55 564q-10 10-23 10T9 564q-9-10-9-24t9-24L489 10q10-10 23-10t23 10l480 506q9 10 9 24t-9 24z">
+                    </path></svg>
+            </button>
+        </section>
+    </div>
+    <footer>
+        <div class="content-wrapper">
+            <div class="float-left">
+                <p>
+                    &copy; @DateTime.Now.Year - Role Request</p>
+            </div>
+        </div>
+    </footer>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/lodash")
+    @RenderSection("scripts", required: false)
+    @if (User.Identity.IsAuthenticated)
+    {
+        <script src="../../Scripts/ViewsScript/roleRequest.js" type="text/javascript"></script>
+        <script src="../../Scripts/ViewsScript/idmFormForRevocation.js" type="text/javascript"></script>
+    }
+</body>
+</html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.toast').toast({ delay: 2000 });
+        $('.toast').toast('show');
+    });
+</script>

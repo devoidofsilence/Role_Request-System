@@ -1,0 +1,47 @@
+﻿@{
+    ViewBag.Title = "HR Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!--Partial View Here-->
+<div id="prtlHRUsers">
+    @{Html.RenderAction("HRUsersList", "HR", new { hrADName = User.Identity.Name.ToString().ToLower() });}
+</div>
+
+<div class="modal fade" id="hrFormModal" tabindex="-1" role="dialog" aria-labelledby="hrFormModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="hrFormModalLabel">
+                    HR Form
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="prtlHRUserForm">
+                @*@{Html.RenderAction("UserHRDetailForm", "HR", new { EnrollUserID =  });}*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="hrFormRejectModal" tabindex="-1" role="dialog" aria-labelledby="hrFormRejectModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="hrFormRejectModalLabel">
+                    Reject
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="prtlHRUserRejectForm">
+                @*@{Html.RenderAction("UserHRDetailForm", "HR", new { EnrollUserID =  });}*@
+            </div>
+        </div>
+    </div>
+</div>

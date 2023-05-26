@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "ID Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!--Partial View Here-->
+<div id="prtlIDMUsers">
+    @{Html.RenderAction("IDMUsersList", "IDManagement", new { idmADName = User.Identity.Name.ToString().ToLower() });}
+</div>
+
+<div class="modal fade" id="idmFormModal" tabindex="-1" role="dialog" aria-labelledby="idmFormModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idmFormModalLabel">
+                    ID Management Form
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="prtlIDMUserForm">
+                @*@{Html.RenderAction("UserIDMDetailForm", "IDManagement");}*@
+            </div>
+        </div>
+    </div>
+</div>

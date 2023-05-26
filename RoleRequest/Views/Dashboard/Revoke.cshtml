@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "Revoke";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!--Partial View Here-->
+<div id="prtlHRUsersListForRevocation">
+    @{Html.RenderAction("HRUsersListForRevocation", "HR");}
+</div>
+
+@*Revocation*@
+<div class="modal fade" id="revokeRequestModal" tabindex="-1" role="dialog" aria-labelledby="revokeRequestModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="revokeRequestModalLabel">
+                    Revoke Request
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="prtlRevokeRequest">
+            </div>
+        </div>
+    </div>
+</div>
